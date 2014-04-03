@@ -145,3 +145,25 @@ above. There's just a few things to keep in mind:
 
 7. The `create-server` command doesn't run any scripts for you, it
    just creates a new server based on the given template.
+
+#### Example Scripts
+
+If you wanted to install Ruby 2 in your setup phase, you might add
+this to one of your scripts
+([courtesy of Brandon Hilkert](https://github.com/brandonhilkert/fucking_shell_scripts)):
+
+```bash
+#!/bin/sh
+#
+# scripts/ruby2.sh
+#
+sudo apt-get -y install build-essential zlib1g-dev libssl-dev libreadline6-dev libyaml-dev
+cd /tmp
+wget http://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p247.tar.gz
+tar -xzf ruby-2.0.0-p247.tar.gz
+cd ruby-2.0.0-p247
+./configure --prefix=/usr/local
+make
+sudo make install
+rm -rf /tmp/ruby*
+```
