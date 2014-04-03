@@ -93,3 +93,28 @@ resources/
 
 Note: there's nothing special about the internal structure
 here. Everything in this dir is referenced via `config.yml`.
+
+#### Details
+
+Most of how it works should be self-explanatory from the examples
+above. There's just a few things to keep in mind:
+
+1. Billow assumes it's only dealing with servers it created. So it
+   assumes that the name will be in the "{env}-{template}-{n}"
+   format. But that's really all it assumes.
+
+2. The `copy_files` section of a script will copy all the files from
+   the local paths (relative to the project root) to the remote
+   *absolute* path, creating directories as needed.
+
+3. The `copy_files` section will template any *individual* files whose
+   local path end in `.erb`, using ERB. The context will have access
+   to `server` representing the Fog server, `cloud` representing the
+   Fog::Compute instance, and `configs` representing your configs (via
+   [figgy](https://github.com/pd/figgy)). Also, each Fog server has
+   two new methods: `env` and `template`.
+
+3. The files in `run_scripts` will be run *after* the `copy_files`
+   section is done being copied over, and the paths represent the
+   remote *absolute* paths. It's your responsibility to make sure
+   they're executable.
