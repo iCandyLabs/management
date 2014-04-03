@@ -118,3 +118,6 @@ above. There's just a few things to keep in mind:
    section is done being copied over, and the paths represent the
    remote *absolute* paths. It's your responsibility to make sure
    they're executable.
+
+5. The `envs` section is strictly there to catch our typos. You can
+   only create/destroy/etc servers in a valid environment.
