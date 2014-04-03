@@ -50,6 +50,10 @@ Copying resources/scripts/setup_new_server.sh to /home/webapp/setup_new_server.s
 Copying resources/scripts/upgrade_server.sh to /home/webapp/upgrade_server.sh ...
 Running /home/webapp/setup_new_server.sh remotely ...
 ---------------------------
+++ echo hello world
+
+hello world
+
 Success!
 ```
 
@@ -165,6 +169,11 @@ above. There's just a few things to keep in mind:
    remotely. Couldn't think of a better word for it though that wasn't
    too far out there or knee deep in strange analogies. I'd love some
    suggestions.
+
+9. The `run_scripts` section doesn't have to have bash scripts,
+   although that's the simplest way. They just need to be something
+   executable. NOTE: if they are bash scripts, it's a good idea to add
+   `set -e` and `set -x` to the top of them.
 
 #### Example Scripts
 
