@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/billow.rb'
+Billow::Interpreter.interpret! ARGV.dup
