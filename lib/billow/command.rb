@@ -57,7 +57,7 @@ module Billow
     end
 
     def config
-      @config ||= Figgy.build{|config| config.root  = 'resources'}.config
+      @config ||= Figgy.build{|config| config.root = '.'}.billow_config
     end
 
     def cloud

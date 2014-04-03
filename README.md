@@ -61,7 +61,7 @@ roughly what it does:
 
 #### Setup
 
-Put this in `resources/config.yml':
+Put this in `billow_config.yml':
 
 ```yaml
 cloud:  # NOTE: this just gets passed to Fog::Compute.new
@@ -92,24 +92,29 @@ scripts:
       - /home/webapp/setup_new_server.sh
 ```
 
-Billow assumes everything relevant is in `./resources/`:
+Billow doesn't care where any of your files are, with the exception of
+`billow_config.yml`, which it expects to be in your project's root.
+
+Here's the relevant part of the file structure that the above sample
+config assumes:
 
 ```
-resources/
-|-- config.yml
-|-- files
-|   |-- nginx.conf
-|   `-- web.conf.erb
-|-- keys
-|   |-- id_rsa_digitalocean
-|   `-- id_rsa_digitalocean.pub
-`-- scripts
-    |-- setup_new_server.sh
-    `-- upgrade_server.sh
+./my-project
+|-- billow_config.yml
+`-- resources
+    |-- files
+    |   |-- nginx.conf
+    |   `-- web.conf.erb
+    |-- keys
+    |   |-- id_rsa_digitalocean
+    |   `-- id_rsa_digitalocean.pub
+    `-- scripts
+        |-- setup_new_server.sh
+        `-- upgrade_server.sh
 ```
 
 Note: there's nothing special about the internal structure
-here. Everything in this dir is referenced via `config.yml`.
+here. Everything in this dir is referenced via `billow_config.yml`.
 
 #### Details
 
