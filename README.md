@@ -18,21 +18,28 @@ Usage:
 
     -h, --help                       Display this screen
     -v, --version                    Show version
+```
 
+```
 $ billow list-servers
 Running task "list-servers"...
+```
 
-
+```
 $ billow create-server staging web
 Running task "create-server"...
 
 Created "staging-web-1".
+```
 
+```
 $ billow list-servers
 Running task "list-servers"...
 
   staging-web-1  107.170.80.230  new
+```
 
+```
 $ billow run-script staging-web-1 provision
 Running task "run-script"...
 
