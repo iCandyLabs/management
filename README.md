@@ -2,6 +2,8 @@
 
 Minimalist generic deployment tool.
 
+- Version: **0.1**
+
 #### Usage
 
 ```
