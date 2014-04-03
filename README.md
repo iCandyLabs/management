@@ -153,6 +153,12 @@ above. There's just a few things to keep in mind:
 7. The `create-server` command doesn't run any scripts for you, it
    just creates a new server based on the given template.
 
+8. The `scripts` section is admittedly poorly named, since each
+   "script" is really a collection of files to copy and scripts to run
+   remotely. Couldn't think of a better word for it though that wasn't
+   too far out there or knee deep in strange analogies. I'd love some
+   suggestions.
+
 #### Example Scripts
 
 If you wanted to install Ruby 2 in your setup phase, you might add
