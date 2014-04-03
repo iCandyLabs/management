@@ -129,7 +129,9 @@ above. There's just a few things to keep in mind:
    to `server` representing the Fog server, `cloud` representing the
    Fog::Compute instance, and `configs` representing your configs (via
    [figgy](https://github.com/pd/figgy)). Also, each Fog server has
-   two new methods: `env` and `template`.
+   two new methods: `env` and `template`. NOTE: if you only specified
+   a directory, and it happens to contain `.erb` files, they won't be
+   templated.
 
 4. The files in `run_scripts` will be run *after* the `copy_files`
    section is done being copied over, and the paths represent the
