@@ -84,7 +84,7 @@ templates:
 scripts:
   provision:
     copy_files:
-      - [resources/files/web.conf.erb, /etc/init/web.conf] # this will get templated via ERB
+      - [resources/files/web.conf.erb, /etc/init/web.conf] # will be templated
       - [resources/files/nginx.conf, /etc/init/nginx.conf]
       - [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
       - [resources/scripts/upgrade_server.sh, /home/webapp/upgrade_server.sh]
