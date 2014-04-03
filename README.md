@@ -2,7 +2,7 @@
 
 #### Usage
 
-```bash
+```
 $ billow
 Usage:
 
