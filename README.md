@@ -1,5 +1,7 @@
 ### billow
 
+Minimalist generic deployment tool.
+
 #### Usage
 
 ```
@@ -41,6 +43,19 @@ Running /home/webapp/setup_new_server.sh remotely ...
 ---------------------------
 Success!
 ```
+
+#### How it works
+
+Most of the interesting functionality is in `run-script`. Here's
+roughly what it does:
+
+- copies all your files into a temp directory,
+- renames them to their remote paths,
+- templates any individual files that end with .erb,
+- gzips them,
+- scps this to the server,
+- extracts them into their (absolute) destinations,
+- runs whatever scripts you've chosen
 
 #### Setup
 
@@ -121,3 +136,10 @@ above. There's just a few things to keep in mind:
 
 5. The `envs` section is strictly there to catch our typos. You can
    only create/destroy/etc servers in a valid environment.
+
+6. The files under `run_scripts` aren't copied for you automatically,
+   they should either already be on the remote server, or you should
+   copy them in the `copy_files` section.
+
+7. The `create-server` command doesn't run any scripts for you, it
+   just creates a new server based on the given template.
