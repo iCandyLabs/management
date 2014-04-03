@@ -114,7 +114,7 @@ above. There's just a few things to keep in mind:
    [figgy](https://github.com/pd/figgy)). Also, each Fog server has
    two new methods: `env` and `template`.
 
-3. The files in `run_scripts` will be run *after* the `copy_files`
+4. The files in `run_scripts` will be run *after* the `copy_files`
    section is done being copied over, and the paths represent the
    remote *absolute* paths. It's your responsibility to make sure
    they're executable.
