@@ -38,10 +38,12 @@ $ billow list-servers
 $ billow run-script staging-web-1 provision
 Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
 Running /home/webapp/bootstrap_base.sh
+[...snip...]
 Copying resources/files/web.conf.erb -> /etc/init/web.conf
 Copying resources/files/nginx.conf -> /etc/init/nginx.conf
 Copying resources/scripts/start_web_server.sh -> /home/webapp/start_web_server.sh
 Running /home/webapp/start_web_server.sh
+[...snip...]
 ```
 
 #### How it works
