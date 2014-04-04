@@ -22,33 +22,26 @@ Usage:
 
 ```
 $ billow list-servers
-Running task "list-servers"...
 ```
 
 ```
 $ billow create-server staging web
-Running task "create-server"...
-
 Created "staging-web-1".
 ```
 
 ```
 $ billow list-servers
-Running task "list-servers"...
-
   staging-web-1  107.170.80.230  new
 ```
 
 ```
 $ billow run-script staging-web-1 provision
-Running task "run-script"...
-
 Running provision on staging-web-1...
-Copying resources/files/web.conf.erb to /etc/init/web.conf and templating ...
-Copying resources/files/nginx.conf to /etc/init/nginx.conf ...
-Copying resources/scripts/setup_new_server.sh to /home/webapp/setup_new_server.sh ...
-Copying resources/scripts/upgrade_server.sh to /home/webapp/upgrade_server.sh ...
-Running /home/webapp/setup_new_server.sh remotely ...
+Copying resources/files/web.conf.erb -> /etc/init/web.conf
+Copying resources/files/nginx.conf -> /etc/init/nginx.conf
+Copying resources/scripts/setup_new_server.sh -> /home/webapp/setup_new_server.sh
+Copying resources/scripts/upgrade_server.sh -> /home/webapp/upgrade_server.sh
+Running /home/webapp/setup_new_server.sh
 ---------------------------
 ++ echo hello world
 
@@ -94,13 +87,11 @@ templates:
 
 scripts:
   provision:
-    copy_files:
-      - [resources/files/web.conf.erb, /etc/init/web.conf]  # NOTE: will be templated
-      - [resources/files/nginx.conf, /etc/init/nginx.conf]
-      - [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
-      - [resources/scripts/upgrade_server.sh, /home/webapp/upgrade_server.sh]
-    run_scripts:
-      - /home/webapp/setup_new_server.sh
+    - copy: [resources/files/web.conf.erb, /etc/init/web.conf, template: true]
+    - copy: [resources/files/nginx.conf, /etc/init/nginx.conf]
+    - copy: [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
+    - copy: [resources/scripts/upgrade_server.sh, /home/webapp/upgrade_server.sh]
+    - run: /home/webapp/setup_new_server.sh
 ```
 
 Billow doesn't care where any of your files are, with the exception of
@@ -136,44 +127,44 @@ above. There's just a few things to keep in mind:
    assumes that the name will be in the "{env}-{template}-{n}"
    format. But that's really all it assumes.
 
-2. The `copy_files` section of a script will copy all the files from
+2. A `copy` line in the `scripts` section will copy all the files from
    the local paths (relative to the project root) to the remote
    *absolute* path, creating directories as needed.
 
-3. The `copy_files` section will template any *individual* files whose
-   local path end in `.erb`, using ERB. The context will have access
-   to `server` representing the Fog server, `cloud` representing the
-   Fog::Compute instance, and `configs` representing your configs (via
+3. If a `copy` line has a third entry of `template: true`, then it
+   will be run through ERB. The context will have access to `server`
+   representing the Fog server, `cloud` representing the Fog::Compute
+   instance, and `configs` representing your configs (via
    [figgy](https://github.com/pd/figgy)). Also, each Fog server has
    two new methods: `env` and `template`. NOTE: if you only specified
    a directory, and it happens to contain `.erb` files, they won't be
    templated.
 
-4. The files in `run_scripts` will be run *after* the `copy_files`
-   section is done being copied over, and the paths represent the
-   remote *absolute* paths. It's your responsibility to make sure
-   they're executable.
+4. A `run` line in a script will be run on the remote server. The
+   paths represent the remote *absolute* paths. It's your
+   responsibility to make sure they're executable.
 
-5. The `envs` section is strictly there to catch our typos. You can
-   only create/destroy/etc servers in a valid environment.
+5. Files specified by `run` aren't copied for you automatically; they
+   should either already be on the remote server, or you should copy
+   them with a `copy` line.
 
-6. The files under `run_scripts` aren't copied for you automatically,
-   they should either already be on the remote server, or you should
-   copy them in the `copy_files` section.
+6. The `envs` section is strictly there to catch typos and
+   wrongly-ordered arguments at the command line. You can only
+   create/destroy/etc servers in a valid environment.
 
 7. The `create-server` command doesn't run any scripts for you, it
    just creates a new server based on the given template.
 
 8. The `scripts` section is admittedly poorly named, since each
-   "script" is really a collection of files to copy and scripts to run
-   remotely. Couldn't think of a better word for it though that wasn't
-   too far out there or knee deep in strange analogies. I'd love some
+   "script" is really an ordered list of files to copy and scripts to
+   run remotely. Couldn't think of a better word for it though that
+   wasn't too far out there or knee-deep in analogies. I'd love some
    suggestions.
 
-9. The `run_scripts` section doesn't have to have bash scripts,
-   although that's the simplest way. They just need to be something
-   executable. NOTE: if they are bash scripts, it's a good idea to add
-   `set -e` and `set -x` to the top of them.
+9. A `script` line doesn't have to be a bash scripts, although that's
+   the simplest way. It just needs to be something executable. TIP: if
+   it's a bash script, it's a good idea to add `set -e` and `set -x`
+   to the top of them.
 
 #### Example Scripts
 
