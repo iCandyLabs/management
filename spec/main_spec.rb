@@ -41,7 +41,7 @@ describe 'billow' do
     FileUtils.mkdir_p('/tmp/bla')
     Dir.stub(:mktmpdir).and_return('/tmp/bla')
     Dir.mkdir('resources')
-    File.open('resources/config.yml', 'w') { |f| f.write(SIMPLE_CONFIG) }
+    File.open('billow_config.yml', 'w') { |f| f.write(SIMPLE_CONFIG) }
     File.open('resources/web.conf.erb', 'w') { |f| f.write("env = <%= server.env %>") }
     File.open('resources/testing.sh', 'w') { |f| f.write("echo hello > world") }
     File.open('resources/my-ssh-key', 'w') { |f| f.write("foobar") }
