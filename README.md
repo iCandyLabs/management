@@ -38,11 +38,13 @@ Running /home/webapp/start_web_server.sh
 [...snip...]
 ```
 
-#### How it works
+#### Niche
 
-Nearly all the work is done locally. The remote server only needs ssh
-and `tar -xzf` to be available, which means it'll work in pretty much
-any linux server, out-of-the-box.
+The remote server only needs ssh and `tar -xzf` to be available, which
+means it'll work in pretty much any linux server, out-of-the-box.
+
+If you only need to provision and manage a handful of servers, this
+project may be right for you.
 
 #### Setup
 
