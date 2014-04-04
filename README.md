@@ -111,7 +111,7 @@ sample config assumes:
 #### Details
 
 Most of how it works should be self-explanatory from the examples
-above. There's just a few things to keep in mind:
+above. There's just a few things that might not be obvious:
 
 1. Billow assumes it's only dealing with servers it created. So it
    assumes that the name will be in the "{env}-{template}-{n}"
