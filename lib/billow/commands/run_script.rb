@@ -13,8 +13,6 @@ module Billow
       server = get_server(server_name)
       script = get_script(script_name)
 
-      puts "Running #{script_name} on #{server_name}..."
-
       tmpdir = Dir.mktmpdir('billow') # /tmp/billow
       fakeremote_dir = File.join(tmpdir, BILLOW_DIR) # /tmp/billow/__billow__
 

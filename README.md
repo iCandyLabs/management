@@ -36,24 +36,18 @@ $ billow list-servers
 
 ```
 $ billow run-script staging-web-1 provision
-Running provision on staging-web-1...
+Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
+Running /home/webapp/bootstrap_base.sh
 Copying resources/files/web.conf.erb -> /etc/init/web.conf
 Copying resources/files/nginx.conf -> /etc/init/nginx.conf
-Copying resources/scripts/setup_new_server.sh -> /home/webapp/setup_new_server.sh
-Copying resources/scripts/upgrade_server.sh -> /home/webapp/upgrade_server.sh
-Running /home/webapp/setup_new_server.sh
----------------------------
-++ echo hello world
-
-hello world
-
-Success!
+Copying resources/scripts/start_web_server.sh -> /home/webapp/start_web_server.sh
+Running /home/webapp/start_web_server.sh
 ```
 
 #### How it works
 
-Nearly all the work is done locally. The remote server only needs ssh,
-tar, and gzip to be available, which means it'll work in pretty much
+Nearly all the work is done locally. The remote server only needs ssh
+and `tar -xzf` to be available, which means it'll work in pretty much
 any linux server, out-of-the-box.
 
 #### Setup
@@ -80,8 +74,8 @@ templates:
 
 scripts:
   setup-web:
-    - copy: [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
-    - run: /home/webapp/setup_new_server.sh
+    - copy: [resources/scripts/bootstrap_base.sh, /home/webapp/bootstrap_base.sh]
+    - run: /home/webapp/bootstrap_base.sh
     - copy: [resources/files/web.conf.erb, /etc/init/web.conf, template: true]
     - copy: [resources/files/nginx.conf, /etc/init/nginx.conf]
     - copy: [resources/scripts/start_web_server.sh, /home/webapp/start_web_server.sh]
@@ -104,7 +98,7 @@ sample config assumes:
     |   |-- id_rsa_digitalocean
     |   `-- id_rsa_digitalocean.pub
     `-- scripts
-        |-- setup_new_server.sh
+        |-- bootstrap_base.sh
         `-- start_web_server.sh
 ```
 
