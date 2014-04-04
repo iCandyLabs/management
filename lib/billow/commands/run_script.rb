@@ -15,8 +15,8 @@ module Billow
 
       puts "Running #{script_name} on #{server_name}..."
 
-      tmpdir = Dir.mktmpdir('billow')
-      fakeremote_dir = File.join(tmpdir, BILLOW_DIR)
+      tmpdir = Dir.mktmpdir('billow') # /tmp/billow
+      fakeremote_dir = File.join(tmpdir, BILLOW_DIR) # /tmp/billow/__billow__
 
       template = config.templates[server.template]
       ssh_key_path = template[:ssh_key_path]
@@ -24,47 +24,55 @@ module Billow
 
       Dir.mkdir(fakeremote_dir)
 
-      script.copy_files.each do |local, remote|
-        local_file = File.join(Dir.pwd, local)
-        remote_file = File.join(fakeremote_dir, remote)
+      script.each do |thing|
+        type, data = *thing.first
 
-        # TODO: fail unless File.exists?(local_file)
+        case type.to_sym
+        when :copy
+          local, remote = *data
+          puts "Copying #{local} -> #{remote}"
 
-        is_template = local_file.end_with?('.erb')
+          local_file = File.join(Dir.pwd, local)
+          remote_file = File.join(fakeremote_dir, remote)
 
-        puts "Copying #{local} to #{remote}#{' and templating' if is_template} ..."
+          # TODO: fail unless File.exists?(local_file)
 
-        FileUtils.mkdir_p File.dirname(remote_file)
-        FileUtils.cp_r local_file, remote_file, preserve: true
+          is_template = local_file.end_with?('.erb')
 
-        if is_template
-          new_contents = ERB.new(File.read(remote_file)).result(binding)
-          File.open(remote_file, 'w') {|f| f.write(new_contents)}
-        end
-      end
+          FileUtils.mkdir_p File.dirname(remote_file)
+          FileUtils.cp_r local_file, remote_file, preserve: true
 
-      local_zipfile = File.join(tmpdir, BILLOW_DIR) + '.tar.gz'
-      remote_zipfile = "/tmp/#{BILLOW_DIR}.tar.gz"
-
-      Dir.chdir(fakeremote_dir) { system("tar -czf #{local_zipfile} .") }
-
-      server.scp(local_zipfile, remote_zipfile)
-      server.ssh("tar -xzf #{remote_zipfile} -C /")
-
-      script.run_scripts.each do |path|
-        puts "Running #{path} remotely ...\n"
-
-        result = server.ssh("#{path}").first
-
-        if result.respond_to?(:status)
-          puts
-          puts "---------------------------"
-          if result.status == 0
-            puts "Success!"
-          else
-            puts "Failed. Exit code: #{result.status}"
+          if is_template
+            new_contents = ERB.new(File.read(remote_file)).result(binding)
+            File.open(remote_file, 'w') {|f| f.write(new_contents)}
           end
+
+          local_zipfile = File.join(tmpdir, BILLOW_DIR) + '.tar.gz'
+          remote_zipfile = "/tmp/#{BILLOW_DIR}.tar.gz"
+
+          Dir.chdir(fakeremote_dir) { system("tar -czf #{local_zipfile} .") }
+
+          server.scp(local_zipfile, remote_zipfile)
+          server.ssh("tar -xzf #{remote_zipfile} -C /")
+
+        when :run
+          script = data
+          puts "Running #{script}"
+
+          result = server.ssh("#{script}").first
+
+          if result.respond_to?(:status)
+            puts
+            puts "---------------------------"
+            if result.status == 0
+              puts "Success!"
+            else
+              puts "Failed. Exit code: #{result.status}"
+            end
+          end
+
         end
+
       end
 
     end

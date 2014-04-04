@@ -23,11 +23,9 @@ templates:
 
 scripts:
   testing:
-    copy_files:
-      - [resources/web.conf.erb, /etc/init/web.conf]
-      - [resources/testing.sh, /home/web/testing.sh]
-    run_scripts:
-      - /home/web/testing.sh
+    - copy: [resources/web.conf.erb, /etc/init/web.conf]
+    - copy: [resources/testing.sh, /home/web/testing.sh]
+    - run: /home/web/testing.sh
 CONFIG
 
 
@@ -57,16 +55,16 @@ describe 'billow' do
     it "uploads files (templating as needed) and runs scripts on the remote server" do
       storage.servers.create(name: 'staging-web-7', image_id: 2676, region_id: 1, flavor_id: 33)
 
-      subject.should_receive(:system).with('tar -czf /tmp/bla/__billow__.tar.gz .')
+      subject.should_receive(:system).with('tar -czf /tmp/bla/__billow__.tar.gz .').twice
 
       subject.call 'staging-web-7', 'testing'
 
       File.read('/tmp/bla/__billow__/etc/init/web.conf').should == "env = staging"
 
       scp = storage.servers.first.scp('foo', 'bar').first
-      ssh1, ssh2 = *storage.servers.first.ssh('foo')
+      ssh1, ssh2, ssh3 = *storage.servers.first.ssh('foo')
 
-      [scp, ssh1, ssh2].each do |thing|
+      [scp, ssh1, ssh2, ssh3].each do |thing|
         thing[:options][:key_data].should == ['foobar']
         thing[:options][:auth_methods].should == ['publickey']
       end
@@ -75,7 +73,8 @@ describe 'billow' do
       scp[:remote_path].should == '/tmp/__billow__.tar.gz'
 
       ssh1[:commands].should == "tar -xzf /tmp/__billow__.tar.gz -C /"
-      ssh2[:commands].should == '/home/web/testing.sh'
+      ssh2[:commands].should == "tar -xzf /tmp/__billow__.tar.gz -C /"
+      ssh3[:commands].should == '/home/web/testing.sh'
     end
 
   end
