@@ -23,7 +23,7 @@ templates:
 
 scripts:
   testing:
-    - copy: [resources/web.conf.erb, /etc/init/web.conf]
+    - copy: [resources/web.conf.erb, /etc/init/web.conf, template: true]
     - copy: [resources/testing.sh, /home/web/testing.sh]
     - run: /home/web/testing.sh
 CONFIG

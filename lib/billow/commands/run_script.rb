@@ -29,7 +29,7 @@ module Billow
 
         case type.to_sym
         when :copy
-          local, remote = *data
+          local, remote, opts = *data
           puts "Copying #{local} -> #{remote}"
 
           local_file = File.join(Dir.pwd, local)
@@ -37,7 +37,7 @@ module Billow
 
           # TODO: fail unless File.exists?(local_file)
 
-          is_template = local_file.end_with?('.erb')
+          is_template = opts && opts.template
 
           FileUtils.mkdir_p File.dirname(remote_file)
           FileUtils.cp_r local_file, remote_file, preserve: true
