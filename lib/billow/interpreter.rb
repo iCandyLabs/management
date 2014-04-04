@@ -20,13 +20,9 @@ module Billow
 
         input << "-h" if input.empty?
         args = parser.parse(input)
-
         task = args.shift
 
-        chosen_command = commands.find{|c|c.command_name == task}
-
-        if chosen_command
-          puts "Running task \"#{task}\"...\n\n"
+        if chosen_command = commands.find{|c|c.command_name == task}
           chosen_command.new.call(*args)
         else
           puts "Error: unknown task \"#{task}\""
