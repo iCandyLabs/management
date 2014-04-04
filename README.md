@@ -18,23 +18,15 @@ Usage:
 
     -h, --help                       Display this screen
     -v, --version                    Show version
-```
 
-```
 $ billow list-servers
-```
 
-```
 $ billow create-server staging web
 Created "staging-web-1".
-```
 
-```
 $ billow list-servers
   staging-web-1  107.170.80.230  new
-```
 
-```
 $ billow run-script staging-web-1 provision
 Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
 Running /home/webapp/bootstrap_base.sh
