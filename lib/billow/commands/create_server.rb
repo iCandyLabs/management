@@ -20,7 +20,8 @@ module Billow
                            flavor_id: flavor.id,
                            image_id: image.id,
                            region_id: region.id,
-                           ssh_key_ids: [ssh_key.id])
+                           ssh_key_ids: [ssh_key.id],
+                           private_networking: true)
 
       puts "Created \"#{name}\"."
     end
