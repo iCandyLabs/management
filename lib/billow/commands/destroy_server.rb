@@ -6,8 +6,16 @@ module Billow
 
     def call(server_name)
       server = get_server(server_name)
-      server.destroy
-      puts "Destroyed."
+
+      print "Are you sure you want to do this? Type 'Yes' to continue, or anything else to abort: "
+      answer = gets.chomp
+
+      if answer == 'Yes'
+        server.destroy
+        puts "Destroyed."
+      else
+        puts "Aborted."
+      end
     end
 
   end

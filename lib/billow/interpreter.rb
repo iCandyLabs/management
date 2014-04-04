@@ -21,6 +21,7 @@ module Billow
         input << "-h" if input.empty?
         args = parser.parse(input)
         task = args.shift
+        ARGV.clear
 
         if chosen_command = commands.find{|c|c.command_name == task}
           chosen_command.new.call(*args)
