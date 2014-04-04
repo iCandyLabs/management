@@ -25,7 +25,9 @@ $ billow create-server staging web
 Created "staging-web-1".
 
 $ billow list-servers
-  staging-web-1  107.170.80.230  new
+Name             State       IP                    Private IP
+---------------  ----------  --------------------  --------------------
+staging-db-1     active      107.170.80.230        10.128.198.115
 
 $ billow run-script staging-web-1 provision
 Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
