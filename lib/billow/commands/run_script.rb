@@ -53,6 +53,8 @@ module Billow
           server.scp(local_zipfile, remote_zipfile)
           server.ssh("tar -xzf #{remote_zipfile} -C /")
 
+          File.delete(local_zipfile)
+
         when :run
           script = data
           puts "Running #{script}"
