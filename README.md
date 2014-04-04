@@ -52,16 +52,9 @@ Success!
 
 #### How it works
 
-Most of the interesting functionality is in `run-script`. Here's
-roughly what it does:
-
-- copies all your files into a temp directory,
-- renames them to their remote paths,
-- templates any individual files that end with .erb,
-- gzips them,
-- scps this to the server,
-- extracts them into their (absolute) destinations,
-- runs whatever scripts you've chosen
+Nearly all the work is done locally. The remote server only needs ssh,
+tar, and gzip to be available, which means it'll work in pretty much
+any linux server, out-of-the-box.
 
 #### Setup
 
@@ -86,12 +79,13 @@ templates:
     ssh_key_path: resources/keys/id_rsa_digitalocean
 
 scripts:
-  provision:
+  setup-web:
+    - copy: [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
+    - run: /home/webapp/setup_new_server.sh
     - copy: [resources/files/web.conf.erb, /etc/init/web.conf, template: true]
     - copy: [resources/files/nginx.conf, /etc/init/nginx.conf]
-    - copy: [resources/scripts/setup_new_server.sh, /home/webapp/setup_new_server.sh]
-    - copy: [resources/scripts/upgrade_server.sh, /home/webapp/upgrade_server.sh]
-    - run: /home/webapp/setup_new_server.sh
+    - copy: [resources/scripts/start_web_server.sh, /home/webapp/start_web_server.sh]
+    - run: /home/webapp/start_web_server.sh
 ```
 
 Billow doesn't care where any of your files are, with the exception of
@@ -112,7 +106,7 @@ config assumes:
     |   `-- id_rsa_digitalocean.pub
     `-- scripts
         |-- setup_new_server.sh
-        `-- upgrade_server.sh
+        `-- start_web_server.sh
 ```
 
 Note: there's nothing special about the internal structure
