@@ -89,10 +89,9 @@ scripts:
 ```
 
 Billow doesn't care where any of your files are, with the exception of
-`billow_config.yml`, which it expects to be in your project's root.
-
-Here's the relevant part of the file structure that the above sample
-config assumes:
+`billow_config.yml`, which it expects to be in your project's
+root. Here's the relevant part of the file structure that the above
+sample config assumes:
 
 ```
 ./my-project
@@ -108,9 +107,6 @@ config assumes:
         |-- setup_new_server.sh
         `-- start_web_server.sh
 ```
-
-Note: there's nothing special about the internal structure
-here. Everything in this dir is referenced via `billow_config.yml`.
 
 #### Details
 
