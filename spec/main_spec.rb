@@ -13,7 +13,7 @@ envs:
   - staging
   - production
 
-templates:
+types:
   web:
     image: Ubuntu 12.04 x64
     region: New York 1
@@ -87,7 +87,7 @@ describe 'billow' do
       servers.map(&:name).should == ['staging-web-1']
     end
 
-    it "requires a valid template" do
+    it "requires a valid type" do
       expect { subject.call 'staging', 'FAKE' }.to raise_error SystemExit
     end
 

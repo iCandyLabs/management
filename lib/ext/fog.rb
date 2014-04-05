@@ -56,6 +56,6 @@ end
 require 'fog/compute/models/server'
 # we're assuming the servers were created via billow only
 class Fog::Compute::Server
-  def env;      name.split('-')[0]; end
-  def template; name.split('-')[1]; end
+  def env;  name.split('-')[0]; end
+  def type; name.split('-')[1]; end
 end

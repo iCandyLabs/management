@@ -44,8 +44,8 @@ module Billow
       config.envs.include?(name) and name or abort "Invalid environment: #{name}"
     end
 
-    def get_template(name)
-      config.templates[name] or abort "Invalid template: #{name}"
+    def get_type(name)
+      config.types[name] or abort "Invalid type: #{name}"
     end
 
     def get_script(name)

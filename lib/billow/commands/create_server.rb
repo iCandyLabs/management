@@ -4,17 +4,17 @@ module Billow
 
   class CreateServer < Billow::Command
 
-    def call(env_name, template_name)
+    def call(env_name, type_name)
       env = get_env(env_name)
-      template = get_template(template_name)
+      type = get_type(type_name)
 
-      image = cloud.images.find{|image| image.name == template[:image]}
-      region = cloud.regions.find{|region| region.name == template[:region]}
-      flavor = cloud.flavors.find{|flavor| flavor.name == template[:flavor]}
-      ssh_key = cloud.ssh_keys.find{|ssh_key| ssh_key.name == template[:ssh_key]}
+      image = cloud.images.find{|image| image.name == type[:image]}
+      region = cloud.regions.find{|region| region.name == type[:region]}
+      flavor = cloud.flavors.find{|flavor| flavor.name == type[:flavor]}
+      ssh_key = cloud.ssh_keys.find{|ssh_key| ssh_key.name == type[:ssh_key]}
 
       servers = cloud.servers
-      name = make_unique_server_name(env_name, template_name, servers)
+      name = make_unique_server_name(env_name, type_name, servers)
 
       cloud.servers.create(name: name,
                            flavor_id: flavor.id,
@@ -26,11 +26,11 @@ module Billow
       puts "Created \"#{name}\"."
     end
 
-    def make_unique_server_name(env_name, template_name, servers)
+    def make_unique_server_name(env_name, type_name, servers)
       i = 1
 
       loop do
-        name = "#{env_name}-#{template_name}-#{i}"
+        name = "#{env_name}-#{type_name}-#{i}"
         if servers.find{|s|s.name == name}
           i += 1
         else

@@ -10,7 +10,7 @@ Minimalist generic deployment tool.
 $ billow
 Usage:
 
-       create-server <env> <template>
+       create-server <env> <type>
       destroy-server <server>
         list-servers [<env>]
           run-script <server> <script>
@@ -62,7 +62,7 @@ envs:
   - staging
   - production
 
-templates:
+types:
   web:
     image: Ubuntu 12.04 x64
     region: New York 1
@@ -106,7 +106,7 @@ Most of how it works should be self-explanatory from the examples
 above. There's just a few things that might not be obvious:
 
 1. Billow assumes it's only dealing with servers it created. So it
-   assumes that the name will be in the "{env}-{template}-{n}"
+   assumes that the name will be in the "{env}-{type}-{n}"
    format. But that's really all it assumes.
 
 2. A `copy` line in the `scripts` section will copy all the files from
@@ -118,7 +118,7 @@ above. There's just a few things that might not be obvious:
    representing the Fog server, `cloud` representing the Fog::Compute
    instance, and `configs` representing your configs (via
    [figgy](https://github.com/pd/figgy)). Also, each Fog server has
-   two new methods: `env` and `template`. NOTE: if you only specified
+   two new methods: `env` and `type`. NOTE: if you only specified
    a directory, and it happens to contain `.erb` files, they won't be
    templated.
 
@@ -135,7 +135,7 @@ above. There's just a few things that might not be obvious:
    create/destroy/etc servers in a valid environment.
 
 7. The `create-server` command doesn't run any scripts for you, it
-   just creates a new server based on the given template.
+   just creates a new server based on the given type.
 
 8. The `scripts` section is admittedly poorly named, since each
    "script" is really an ordered list of files to copy and scripts to

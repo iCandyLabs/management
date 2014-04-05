@@ -16,8 +16,8 @@ module Billow
       tmpdir = Dir.mktmpdir('billow') # /tmp/billow
       fakeremote_dir = File.join(tmpdir, BILLOW_DIR) # /tmp/billow/__billow__
 
-      template = config.templates[server.template]
-      ssh_key_path = template[:ssh_key_path]
+      type = config.types[server.type]
+      ssh_key_path = type[:ssh_key_path]
       server.private_key_path = ssh_key_path
 
       script.each do |thing|
