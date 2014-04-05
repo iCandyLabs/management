@@ -26,10 +26,10 @@ module Billow
         case type.to_sym
         when :copy
 
-          Dir.mkdir(fakeremote_dir)
-
           local, remote, opts = *data
           puts "Copying #{local} -> #{remote}"
+
+          Dir.mkdir(fakeremote_dir)
 
           local_file = File.join(Dir.pwd, local)
           remote_file = File.join(fakeremote_dir, remote)
