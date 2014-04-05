@@ -20,13 +20,14 @@ module Billow
       ssh_key_path = template[:ssh_key_path]
       server.private_key_path = ssh_key_path
 
-      Dir.mkdir(fakeremote_dir)
-
       script.each do |thing|
         type, data = *thing.first
 
         case type.to_sym
         when :copy
+
+          Dir.mkdir(fakeremote_dir)
+
           local, remote, opts = *data
           puts "Copying #{local} -> #{remote}"
 
@@ -54,6 +55,7 @@ module Billow
           server.ssh("tar -xzf #{remote_zipfile} -C /")
 
           File.delete(local_zipfile)
+          FileUtils.rm_rf(fakeremote_dir)
 
         when :run
           script = data
