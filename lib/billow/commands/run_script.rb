@@ -49,10 +49,13 @@ module Billow
           local_zipfile = File.join(tmpdir, BILLOW_DIR) + '.tar.gz'
           remote_zipfile = "/tmp/#{BILLOW_DIR}.tar.gz"
 
-          Dir.chdir(fakeremote_dir) { system("tar -czf #{local_zipfile} .") }
+          Dir.chdir(fakeremote_dir) { system("find . \\\( -type f -o -type d -empty \\\) -exec tar -czf #{local_zipfile} {} +") }
 
           server.scp(local_zipfile, remote_zipfile)
           server.ssh("tar -xzf #{remote_zipfile} -C /")
+
+          chown = opts && opts.chown || "root:root"
+          server.ssh("chown -R #{chown} #{remote}")
 
           File.delete(local_zipfile)
           FileUtils.rm_rf(fakeremote_dir)
