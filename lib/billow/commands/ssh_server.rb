@@ -9,7 +9,13 @@ module Billow
 
       type = config.types[server.type]
       ssh_key_path = type[:ssh_key_path]
-      system("ssh -i #{ssh_key_path} root@#{server.public_ip_address}")
+      run "chmod 0600 #{ssh_key_path}"
+      run "ssh -i #{ssh_key_path} root@#{server.public_ip_address}"
+    end
+
+    def run(cmd)
+      puts "Running: #{cmd}"
+      system cmd
     end
 
   end
