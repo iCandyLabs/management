@@ -8,22 +8,28 @@ module Billow
       env = get_env(env_name)
       type = get_type(type_name)
 
-      image = cloud.images.find{|image| image.name == type[:image]}
-      region = cloud.regions.find{|region| region.name == type[:region]}
-      flavor = cloud.flavors.find{|flavor| flavor.name == type[:flavor]}
-      ssh_key = cloud.ssh_keys.find{|ssh_key| ssh_key.name == type[:ssh_key]}
-
       servers = cloud.servers
       name = make_unique_server_name(env_name, type_name, servers)
 
-      cloud.servers.create(name: name,
-                           flavor_id: flavor.id,
-                           image_id: image.id,
-                           region_id: region.id,
-                           ssh_key_ids: [ssh_key.id],
-                           private_networking: true)
+      cloud.servers.create(image_id: type[:image],
+                           flavor_id: type[:flavor],
+                           groups: "base",
+                           key_name: type[:key_pair_name],
+                           tags: {
+                             "Creator" => current_user,
+                             "CreatedAt" => Time.new.strftime("%Y%m%d%H%M%S"),
+                             "Name" => name,
+                             "Env" => env_name,
+                             "Meal" => type_name,
+                           })
 
       puts "Created \"#{name}\"."
+    end
+
+    def current_user
+      `git config user.name`.strip
+    rescue
+      "unknown"
     end
 
     def make_unique_server_name(env_name, type_name, servers)

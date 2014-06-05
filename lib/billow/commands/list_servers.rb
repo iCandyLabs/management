@@ -8,7 +8,7 @@ module Billow
       env = get_env(env_name)
 
       cols = [
-        {size: 15, title: "Name",       fn: :name },
+        {size: 20, title: "Name",       fn: :name },
         {size: 10, title: "State",      fn: :state },
         {size: 20, title: "IP",         fn: :public_ip_address },
         {size: 20, title: "Private IP", fn: :private_ip_address },
@@ -19,17 +19,14 @@ module Billow
       ]
 
       format = cols.map{|c| "%-#{c[:size]}s"}.join("  ") + "\n"
-      header = [format].concat(cols.map{|c|c[:title]})
-      seps = [format].concat(cols.map{|c|'-' * c[:size]})
 
-      send :printf, *header
-      send :printf, *seps
+      send :printf, *([format].concat(cols.map{|c|c[:title]}))
+      send :printf, *([format].concat(cols.map{|c|'-' * c[:size]}))
 
       cloud.servers.each do |server|
         next if env_name && server.env != env_name
 
-        row = [format].concat(cols.map{|c|server.send(c[:fn])})
-        send :printf, *row
+        send :printf, *([format].concat(cols.map{|c|server.send(c[:fn])}))
       end
     end
 
