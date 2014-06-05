@@ -25,6 +25,7 @@ module Billow
 
       cloud.servers.each do |server|
         next if env_name && server.env != env_name
+        next if server.state == 'terminated'
 
         send :printf, *([format].concat(cols.map{|c|server.send(c[:fn])}))
       end
