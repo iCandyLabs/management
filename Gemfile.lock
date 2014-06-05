@@ -76,6 +76,9 @@ GEM
     slop (3.5.0)
     thor (0.19.1)
     timers (1.1.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.6)
 
 PLATFORMS
   ruby
@@ -87,3 +90,4 @@ DEPENDENCIES
   guard-rspec
   pry
   rspec
+  unf
