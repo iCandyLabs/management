@@ -33,9 +33,7 @@ module Billow
     end
 
     def make_unique_server_name(env_name, type_name, servers)
-      i = 1
-
-      loop do
+      (1..Float::INFINITY).each do |i|
         name = "#{env_name}-#{type_name}-#{i}"
         if servers.find{|s|s.name == name}
           i += 1
