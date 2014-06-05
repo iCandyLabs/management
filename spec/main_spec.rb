@@ -23,8 +23,8 @@ types:
 
 scripts:
   testing:
-    - copy: [resources/web.conf.erb, /etc/init/web.conf, template: true]
     - copy: [resources/testing.sh, /home/web/testing.sh]
+    - copy: [resources/web.conf.erb, /etc/init/web.conf, template: true]
     - run: /home/web/testing.sh
 CONFIG
 
@@ -36,8 +36,8 @@ describe 'billow' do
   before(:each) do
     Fog.mock!
     Fog::Mock.reset
-    FileUtils.mkdir_p('/tmp/bla')
-    Dir.stub(:mktmpdir).and_return('/tmp/bla')
+    FileUtils.mkdir_p('/tmp/billow')
+    Dir.stub(:mktmpdir).with('billow').and_return('/tmp/billow')
     Dir.mkdir('resources')
     File.open('billow_config.yml', 'w') { |f| f.write(SIMPLE_CONFIG) }
     File.open('resources/web.conf.erb', 'w') { |f| f.write("env = <%= server.env %>") }
@@ -55,11 +55,12 @@ describe 'billow' do
     it "uploads files (templating as needed) and runs scripts on the remote server" do
       storage.servers.create(name: 'staging-web-7', image_id: 2676, region_id: 1, flavor_id: 33)
 
-      subject.should_receive(:system).with('tar -czf /tmp/bla/__billow__.tar.gz .').twice
+      subject.should_receive(:system).with('find . \\( -type f -or -type d -empty \\) -exec tar -czf /tmp/billow/__billow__.tar.gz {} +').twice
 
       subject.call 'staging-web-7', 'testing'
 
-      File.read('/tmp/bla/__billow__/etc/init/web.conf').should == "env = staging"
+      Dir.entries('/tmp/billow/__billow__').should == ['.', '..', 'etc']
+      File.read('/tmp/billow/__billow__/etc/init/web.conf').should == "env = staging"
 
       scp = storage.servers.first.scp('foo', 'bar').first
       ssh1, ssh2, ssh3 = *storage.servers.first.ssh('foo')
@@ -69,7 +70,7 @@ describe 'billow' do
         thing[:options][:auth_methods].should == ['publickey']
       end
 
-      scp[:local_path].should == '/tmp/bla/__billow__.tar.gz'
+      scp[:local_path].should == '/tmp/billow/__billow__.tar.gz'
       scp[:remote_path].should == '/tmp/__billow__.tar.gz'
 
       ssh1[:commands].should == "tar -xzf /tmp/__billow__.tar.gz -C /"
