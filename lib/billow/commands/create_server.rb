@@ -13,7 +13,7 @@ module Billow
 
       cloud.servers.create(image_id: type[:image],
                            flavor_id: type[:flavor],
-                           groups: "base",
+                           groups: type[:groups],
                            key_name: type[:key_pair_name],
                            tags: {
                              "Creator" => current_user,
