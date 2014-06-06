@@ -14,7 +14,8 @@ module Billow
 
       server.private_key_path = config[:types][server.type.to_sym][:ssh_key_path]
 
-      # TODO: fail unless every local file exists via File.exists?(local_file)
+      missing = missing_local_files(script)
+      abort "The following files are missing:\n" + (["\n"] + missing).join("\n - ") if !missing.empty?
 
       script.each do |tuple|
         type, data = *tuple.first
@@ -80,6 +81,20 @@ module Billow
         else
           puts "Failed. Exit code: #{result.status}"
         end
+      end
+    end
+
+    def missing_local_files(script)
+      script.find_all do |tuple|
+        type, data = *tuple.first
+        if type == :copy
+          local, remote = *data
+          ! File.exists?(local)
+        end
+      end.map do |tuple|
+        type, data = *tuple.first
+        local, remote = *data
+        local
       end
     end
 

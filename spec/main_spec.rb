@@ -170,6 +170,20 @@ describe 'billow' do
         Etc.getgrgid(stats.gid).name.should == "staff"
       end
 
+      it "fails if multiple local paths don't exist" do
+        script = subject.get_script("testing")
+        list = subject.missing_local_files(script)
+        list.should == ["resources/testing.sh", "resources/web.conf.erb"]
+      end
+
+      it "fails if a single local path doesn't exist" do
+        FileUtils.mkdir_p "resources"
+        File.write "resources/testing.sh", "hello world"
+        script = subject.get_script("testing")
+        list = subject.missing_local_files(script)
+        list.should == ["resources/web.conf.erb"]
+      end
+
     end
 
   end
