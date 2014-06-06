@@ -2,7 +2,7 @@
 
 Minimalist generic deployment tool.
 
-- Version: **0.2**
+- Version: **0.3**
 
 ![build status](https://travis-ci.org/sdegutis/billow.svg?branch=master)
 
