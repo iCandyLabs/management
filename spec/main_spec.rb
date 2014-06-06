@@ -71,6 +71,19 @@ describe 'billow' do
 
   describe Billow::RunScript do
 
+    # loop through every line in the given script
+    #
+    # if its a run line:
+    #   execute the line literally on the server
+    #
+    # if it's a copy line:
+    #   copy it to a temporary dir with in a subpath based on the remote-absolute-path
+    #   tar it up relative the the remote-absolute-path
+    #   copy the tar file to somewhere remote in /tmp
+    #   delete the local tar file
+    #   untar it remotely relative to /
+    #   delete the remote tar file
+
     it "uploads files (templating as needed) and runs scripts on the remote server" do
       pending
 
