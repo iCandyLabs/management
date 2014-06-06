@@ -137,6 +137,7 @@ describe 'billow' do
 
       subject.make_unique_server_name("staging", "web", []).should == "staging-web-1"
       subject.make_unique_server_name("staging", "web", servers).should == "staging-web-3"
+      subject.make_unique_server_name("production", "web", servers).should == "production-web-2"
     end
 
   end
