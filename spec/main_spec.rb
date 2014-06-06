@@ -213,7 +213,7 @@ describe 'billow' do
 
     it "destroys the given server if you type 'Yes' verbatim" do
       server.should_receive(:destroy).once
-      without_stdout { with_stdin("Yes\n") { subject.call("server-1") } }
+      with_stdin("Yes\n") { without_stdout { subject.call("server-1") } }
     end
 
     it "does not destroy the given server if you don't type 'Yes' verbatim" do
