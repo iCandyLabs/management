@@ -153,12 +153,15 @@ describe 'billow' do
       end
 
       it "chowns files correctly when specified" do
+        user = Etc.passwd.name
+        group = Etc.group.name
+
         File.write("foo", "hello world")
-        without_stdout { subject.copy_file(server, "foo", "/remote/foo", chown: "root:nobody") }
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo", chown: "#{user}:#{group}") }
 
         stats = File.stat("/fake-remote-dir/remote/foo")
-        Etc.getpwuid(stats.uid).name.should == "root"
-        Etc.getgrgid(stats.gid).name.should == "nobody"
+        Etc.getpwuid(stats.uid).name.should == user
+        Etc.getgrgid(stats.gid).name.should == group
       end
 
       it "doesn't chown anything unless specified" do
@@ -166,8 +169,8 @@ describe 'billow' do
         without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
 
         stats = File.stat("/fake-remote-dir/remote/foo")
-        Etc.getpwuid(stats.uid).name.should == `whoami`.chomp
-        Etc.getgrgid(stats.gid).name.should == "staff"
+        Etc.getpwuid(stats.uid).name.should == `id -un`.chomp
+        Etc.getgrgid(stats.gid).name.should == `id -gn`.chomp
       end
 
       it "fails if multiple local paths don't exist" do
