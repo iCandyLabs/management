@@ -154,4 +154,31 @@ describe 'billow' do
 
   end
 
+  describe Billow::StopServer do
+
+    let(:server) { Object.new }
+    before { subject.stub(:get_server).with("server-1").and_return(server) }
+
+    it "destroys the given server if you type 'Yes' verbatim" do
+      server.should_not_receive(:destroy)
+      server.should_receive(:stop).once
+      without_stdout { with_stdin("Yes\n") { subject.call("server-1") } }
+    end
+
+    it "does not destroy the given server if you don't type 'Yes' verbatim" do
+      server.should_not_receive(:destroy)
+      server.should_not_receive(:stop)
+      without_stdout do
+        with_stdin("yes\n") { subject.call("server-1") }
+        with_stdin("Y\n") { subject.call("server-1") }
+        with_stdin("y\n") { subject.call("server-1") }
+        with_stdin("yep\n") { subject.call("server-1") }
+        with_stdin("\n") { subject.call("server-1") }
+        with_stdin("YES\n") { subject.call("server-1") }
+        with_stdin("Yes.\n") { subject.call("server-1") }
+      end
+    end
+
+  end
+
 end
