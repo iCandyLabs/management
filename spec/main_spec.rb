@@ -107,8 +107,6 @@ describe 'billow' do
       end
 
       it "copies file contents into their remote paths" do
-        runner = subject
-
         File.write("foo", "the contents of foo")
 
         remote_files = {}
@@ -117,8 +115,8 @@ describe 'billow' do
 
         file_contents = {}
 
-        runner.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
-          names = runner.relevant_files(in_dir)
+        subject.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
+          names = self.relevant_files(in_dir)
 
           # add the file contents to check later, when mapping from the remote tar
           names.each do |name|
@@ -150,7 +148,7 @@ describe 'billow' do
         end
 
         # without_stdout {
-        runner.copy_file(server, "foo", "/remote/foo")
+        subject.copy_file(server, "foo", "/remote/foo")
         # }
 
         extracted_files.should == ["[fake tar list] - ./remote/foo"]
