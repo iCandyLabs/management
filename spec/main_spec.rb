@@ -1,8 +1,8 @@
 require_relative '../lib/billow'
 require 'fakefs/spec_helpers'
-# require 'net/scp'
 require 'stringio'
 require 'pry'
+require 'etc'
 
 
 SampleConfig = <<EOC
@@ -57,53 +57,53 @@ describe 'billow' do
 
   describe Billow::RunScript do
 
-    describe "copying files over" do
+    include FakeFS::SpecHelpers
 
-      include FakeFS::SpecHelpers
+    describe "finding relevant files to zip" do
 
-      describe "finding relevant files to zip" do
-
-        it "finds all files in the tree" do
-          FileUtils.mkdir_p("/foo/bar/baz")
-          File.write("/foo/bar/baz/quux", "woot")
-          File.write("/foo/bar/baz/zap", "wat")
-          subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
-        end
-
-        it "finds empty leaf directories in the tree" do
-          FileUtils.mkdir_p("/foo/bar/baz")
-          File.write("/foo/bar/baz/quux", "woot")
-          FileUtils.mkdir_p("/foo/bar/baz/zap")
-          subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
-        end
-
-        it "returns dot files" do
-          FileUtils.mkdir_p("/foo/bar/baz")
-          File.write("/foo/bar/baz/.quux", "woot")
-          FileUtils.mkdir_p("/foo/bar/baz/.zap")
-          subject.relevant_files("/").should == ["./foo/bar/baz/.quux", "./foo/bar/baz/.zap"]
-        end
-
-        it "returns relative filenames" do
-          FileUtils.mkdir_p("/foo/bar/baz")
-          File.write("/foo/bar/baz/quux", "woot")
-          FileUtils.mkdir_p("/foo/bar/baz/zap")
-          subject.relevant_files("/foo/bar").should == ["./baz/quux", "./baz/zap"]
-        end
-
-        it "returns relative filenames, even when you add a trailing slash" do
-          FileUtils.mkdir_p("/foo/bar/baz")
-          File.write("/foo/bar/baz/quux", "woot")
-          FileUtils.mkdir_p("/foo/bar/baz/zap")
-          subject.relevant_files("/foo/bar/").should == ["./baz/quux", "./baz/zap"]
-        end
-
-        it "requires an absolute path" do
-          FileUtils.mkdir_p("/foo")
-          expect{ subject.relevant_files("foo") }.to raise_error SystemExit
-        end
-
+      it "finds all files in the tree" do
+        FileUtils.mkdir_p("/foo/bar/baz")
+        File.write("/foo/bar/baz/quux", "woot")
+        File.write("/foo/bar/baz/zap", "wat")
+        subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
       end
+
+      it "finds empty leaf directories in the tree" do
+        FileUtils.mkdir_p("/foo/bar/baz")
+        File.write("/foo/bar/baz/quux", "woot")
+        FileUtils.mkdir_p("/foo/bar/baz/zap")
+        subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
+      end
+
+      it "returns dot files" do
+        FileUtils.mkdir_p("/foo/bar/baz")
+        File.write("/foo/bar/baz/.quux", "woot")
+        FileUtils.mkdir_p("/foo/bar/baz/.zap")
+        subject.relevant_files("/").should == ["./foo/bar/baz/.quux", "./foo/bar/baz/.zap"]
+      end
+
+      it "returns relative filenames" do
+        FileUtils.mkdir_p("/foo/bar/baz")
+        File.write("/foo/bar/baz/quux", "woot")
+        FileUtils.mkdir_p("/foo/bar/baz/zap")
+        subject.relevant_files("/foo/bar").should == ["./baz/quux", "./baz/zap"]
+      end
+
+      it "returns relative filenames, even when you add a trailing slash" do
+        FileUtils.mkdir_p("/foo/bar/baz")
+        File.write("/foo/bar/baz/quux", "woot")
+        FileUtils.mkdir_p("/foo/bar/baz/zap")
+        subject.relevant_files("/foo/bar/").should == ["./baz/quux", "./baz/zap"]
+      end
+
+      it "requires an absolute path" do
+        FileUtils.mkdir_p("/foo")
+        expect{ subject.relevant_files("foo") }.to raise_error SystemExit
+      end
+
+    end
+
+    describe "copying files over" do
 
       let(:server) { Object.new }
 
@@ -134,7 +134,8 @@ describe 'billow' do
         end
 
         server.define_singleton_method(:chown_r) do |remote, chowner|
-          # unused in this test (TODO: move into its own test)
+          user, group = chowner.split(":")
+          FileUtils.chown_R(user, group, File.join("/fake-remote-dir", remote))
         end
 
       end
@@ -149,6 +150,17 @@ describe 'billow' do
         File.write("foo", "the contents of <%= server.env %>")
         without_stdout { subject.copy_file(server, "foo", "/remote/foo", template: true) }
         File.read("/fake-remote-dir/remote/foo").should == "the contents of staging"
+      end
+
+      it "chowns files correctly when specified" do
+        File.write("foo", "hello world")
+        # without_stdout {
+          subject.copy_file(server, "foo", "/remote/foo", chown: "root:nobody")
+        # }
+
+        stats = File.stat("/fake-remote-dir/remote/foo")
+        Etc.getpwuid(stats.uid).name.should == "root"
+        Etc.getgrgid(stats.gid).name.should == "nobody"
       end
 
     end
