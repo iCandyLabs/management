@@ -105,43 +105,42 @@ describe 'billow' do
 
       end
 
-      # just copy_r the given directory's contents into a new temp dir
-      # and put the filename of that new temp dir into out_file
-      let(:fake_zip_method) { lambda do |in_dir, out_file|
+      let(:server) { Object.new }
+
+      before(:each) do
+
+        # just copy_r the given directory's contents into a new temp dir
+        # and put the filename of that new temp dir into out_file
+        subject.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
           zip_dir = Dir.mktmpdir("fake-local-zip-dir")
           FileUtils.cp_r Dir[File.join(in_dir, "*")], zip_dir
           File.write(out_file, zip_dir)
-        end }
+        end
 
-      # local just contains the name of a dir containing all the files
-      let(:fake_copy_file_method) { lambda do |local, remote|
+        server.define_singleton_method(:name) { "server-1" }
+
+        # local just contains the name of a dir containing all the files
+        server.define_singleton_method(:copy_file) do |local, remote|
           # copying "local" zip file to "remote" zip file
           fake_remote = File.join("/fake-remote-dir", remote)
           FileUtils.cp local, fake_remote
-        end }
+        end
 
-      let(:fake_extract_tar_method) { lambda do |remote|
+        # just cp_r the files under fake-zip-dir into /fake-remote-dir
+        server.define_singleton_method(:extract_tar) do |remote|
           tar_dir = File.read(File.join("/fake-remote-dir", remote))
           FileUtils.cp_r(File.join(tar_dir, "*"), "/fake-remote-dir")
-        end }
-
-
-      it "copies file contents into their remote paths" do
-        File.write("foo", "the contents of foo")
-
-        subject.define_singleton_method(:zip_relevant_files, &fake_zip_method)
-
-        server = Object.new
-        server.define_singleton_method(:name) { "server-1" }
-        server.define_singleton_method(:copy_file, &fake_copy_file_method)
-        server.define_singleton_method(:extract_tar, &fake_extract_tar_method)
+        end
 
         server.define_singleton_method(:chown_r) do |remote, chowner|
           # unused in this test (TODO: move into its own test)
         end
 
-        without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
+      end
 
+      it "copies file contents into their remote paths" do
+        File.write("foo", "the contents of foo")
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
         File.read("/fake-remote-dir/remote/foo").should == "the contents of foo"
       end
 
