@@ -121,14 +121,6 @@ describe 'billow' do
 
   describe Billow::CreateServer do
 
-    it "creates a new server" do
-      pending
-
-      subject.call 'staging', 'web'
-      servers = storage.servers
-      servers.map(&:name).should == ['staging-web-1']
-    end
-
     it "uses unique names for servers" do
       fake_server = Struct.new(:name)
       servers = [fake_server.new('staging-web-1'),
