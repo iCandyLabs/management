@@ -23,7 +23,9 @@ module Billow
       send :printf, *([format].concat(cols.map{|c|c[:title]}))
       send :printf, *([format].concat(cols.map{|c|'-' * c[:size]}))
 
-      cloud.servers.each do |server|
+      servers = cloud.servers.sort_by(&:name)
+
+      servers.each do |server|
         next if env_name && server.env != env_name
         next if server.state == 'terminated'
 
