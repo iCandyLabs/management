@@ -15,7 +15,7 @@ module Billow
       server.private_key_path = config[:types][server.type.to_sym][:ssh_key_path]
 
       missing = missing_local_files(script)
-      abort "The following files are missing:\n" + (["\n"] + missing).join("\n - ") if !missing.empty?
+      abort "The following files are missing:" + (["\n"] + missing).join("\n - ") if !missing.empty?
 
       script.each do |tuple|
         type, data = *tuple.first
