@@ -129,6 +129,12 @@ describe 'billow' do
     it "does not destroy the given server if you don't type 'Yes' verbatim" do
       server.should_not_receive(:destroy)
       without_stdout { with_stdin("yes\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("Y\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("y\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("yep\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("YES\n") { subject.call("server-1") } }
+      without_stdout { with_stdin("Yes.\n") { subject.call("server-1") } }
     end
 
   end
