@@ -118,6 +118,7 @@ describe 'billow' do
         end
 
         server.define_singleton_method(:name) { "server-1" }
+        server.define_singleton_method(:env) { "staging" }
 
         # local just contains the name of a dir containing all the files
         server.define_singleton_method(:copy_file) do |local, remote|
@@ -145,8 +146,9 @@ describe 'billow' do
       end
 
       it "templates files correctly" do
-        pending
-        # File.write('resources/web.conf.erb', "env = <%= server.env %>")
+        File.write("foo", "the contents of <%= server.env %>")
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo", template: true) }
+        File.read("/fake-remote-dir/remote/foo").should == "the contents of staging"
       end
 
     end
