@@ -59,4 +59,16 @@ class Fog::Compute::Server
   def env;  tags["Env"]; end
   def type; tags["Meal"]; end
   def name; tags["Name"]; end
+
+  def copy_file(tar_path, remote_tar_path)
+    scp(tar_path, remote_tar_path)
+  end
+
+  def extract_tar(remote_tar_path)
+    ssh("tar -xzf #{remote_tar_path} -C /")
+  end
+
+  def chown_r(remote_path, chown)
+    ssh("chown -R #{chown} #{remote_path}")
+  end
 end

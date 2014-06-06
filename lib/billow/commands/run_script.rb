@@ -2,18 +2,19 @@ require_relative '../command'
 require 'tmpdir'
 require 'fileutils'
 require 'erb'
+require 'shellwords'
 
 module Billow
 
   class RunScript < Billow::Command
-
-    BILLOW_DIR = '__billow__'
 
     def call(server_name, script_name)
       server = get_server(server_name)
       script = get_script(script_name)
 
       server.private_key_path = config[:types][server.type.to_sym][:ssh_key_path]
+
+      # TODO: fail unless every local file exists via File.exists?(local_file)
 
       script.each do |tuple|
         type, data = *tuple.first
@@ -29,53 +30,44 @@ module Billow
 
     end
 
-    def copy_file(server, local, remote, opts = nil)
-      p [:copy, server.name, local, remote, opts]
-      return
-
-      tmpdir = Dir.mktmpdir('billow') # /tmp/billow
-      fakeremote_dir = File.join(tmpdir, BILLOW_DIR) # /tmp/billow/__billow__
-
+    def copy_file(server, local_path, remote_path, opts = nil)
       should_template = opts && opts[:template]
       custom_chown = opts && opts[:chown]
 
-      puts "Copying #{local} -> #{remote}"
+      puts "Copying #{local_path} -> #{remote_path}"
 
-      begin FileUtils.rm_rf(fakeremote_dir) rescue Exception end
-      Dir.mkdir(fakeremote_dir)
+      Dir.mktmpdir('billow-file-dir') do |file_tmpdir|
 
-      local_file = File.join(Dir.pwd, local) # ./resources/web.conf.erb
-      remote_file = File.join(fakeremote_dir, remote) # /tmp/billow/__billow__/etc/init/web.conf
+        # copy to the fake "remote" path locally
+        remote_looking_path = File.join(file_tmpdir, remote_path)
+        FileUtils.mkdir_p File.dirname(remote_looking_path)
+        FileUtils.cp_r local_path, remote_looking_path, preserve: true
 
-      # TODO: fail unless File.exists?(local_file)
+        # overwrite the fake "remote" file with its own templated contents if necessary
+        if should_template
+          new_contents = ERB.new(File.read(remote_looking_path)).result(binding)
+          File.write(remote_looking_path, new_contents)
+        end
 
+        Dir.mktmpdir('billow-tar-dir') do |tar_tmpdir|
 
-      FileUtils.mkdir_p File.dirname(remote_file) # /tmp/billow/__billow__/etc/init/
-      FileUtils.cp_r local_file, remote_file, preserve: true
+          # zip this file up, starting from its absolute path
+          local_tar_path = File.join(tar_tmpdir, "__billow__.tar.gz")
+          zip_relevant_files(file_tmpdir, local_tar_path)
 
-      if should_template
-        new_contents = ERB.new(File.read(remote_file)).result(binding)
-        File.open(remote_file, 'w') {|f| f.write(new_contents)}
+          # copy tar file to remote and extract
+          remote_tar_path = "/tmp/__billow__.tar.gz"
+          server.copy_file(local_tar_path, remote_tar_path)
+          server.extract_tar(remote_tar_path)
+          server.chown_r(remote_path, custom_chown) if custom_chown
+
+        end
+
       end
 
-      local_zipfile = File.join(tmpdir, BILLOW_DIR) + '.tar.gz' # /tmp/billow/__billow__.tar.gz
-      remote_zipfile = "/tmp/#{BILLOW_DIR}.tar.gz" # /tmp/__billow__.tar.gz
-
-      # find either the file or empty leaf directory in /tmp/billow/__billow__ and zip it into /tmp/billow/__billow__.tar.gz
-      zip_relevant_files(fakeremote_dir, local_zipfile)
-
-      server.scp(local_zipfile, remote_zipfile) # copy /tmp/billow/__billow__.tar.gz to remote /tmp/__billow__.tar.gz
-      server.ssh("tar -xzf #{remote_zipfile} -C /")
-
-      if custom_chown
-        server.ssh("chown -R #{chown} #{remote}")
-      end
     end
 
     def run_command(server, cmd)
-      p [:run, server.name, cmd]
-      return
-
       puts "Running #{cmd}"
 
       result = server.ssh("#{cmd}").first
@@ -91,15 +83,24 @@ module Billow
       end
     end
 
+    def relevant_files(at_dir)
+      abort unless at_dir.start_with? "/"
+
+      Dir[File.join(at_dir, "**/*")].select do |path|
+        File.file?(path) || (File.directory?(path) && Dir.entries(path) == [".", ".."])
+      end.map do |path|
+        path.slice! at_dir.end_with?("/") ? at_dir : "#{at_dir}/"
+        "./#{path}"
+      end
+    end
+
     private
 
     def zip_relevant_files(in_dir, out_file)
       Dir.chdir(in_dir) do
-        system("find . \\\( -type f -or -type d -empty \\\) -exec tar -czf #{out_file} {} +")
+        file_list = Shellwords.join(relevant_files(in_dir))
+        system("tar -czf #{out_file} #{file_list}")
       end
-    end
-
-    def with_tmp_dir
     end
 
   end

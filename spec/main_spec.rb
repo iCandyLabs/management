@@ -1,7 +1,8 @@
 require_relative '../lib/billow'
-# require 'fakefs/spec_helpers'
+require 'fakefs/spec_helpers'
 # require 'net/scp'
 require 'stringio'
+require 'pry'
 
 
 SampleConfig = <<EOC
@@ -55,61 +56,103 @@ describe 'billow' do
 
   end
 
-  # include FakeFS::SpecHelpers
-
-  # before(:each) do
-  #   Fog.mock!
-  #   Fog::Mock.reset
-  #   FileUtils.mkdir_p('/tmp/billow')
-  #   Dir.stub(:mktmpdir).with('billow').and_return('/tmp/billow')
-  #   Dir.mkdir('resources')
-  #   File.open('billow_config.yml', 'w') { |f| f.write(SIMPLE_CONFIG) }
-  #   File.open('resources/web.conf.erb', 'w') { |f| f.write("env = <%= server.env %>") }
-  #   File.open('resources/testing.sh', 'w') { |f| f.write("echo hello > world") }
-  #   File.open('resources/my-ssh-key', 'w') { |f| f.write("foobar") }
-  # end
-
   describe Billow::RunScript do
 
-    # loop through every line in the given script
-    #
-    # if its a run line:
-    #   execute the line literally on the server
-    #
-    # if it's a copy line:
-    #   copy it to a temporary dir with in a subpath based on the remote-absolute-path
-    #   tar it up relative the the remote-absolute-path
-    #   copy the tar file to somewhere remote in /tmp
-    #   delete the local tar file
-    #   untar it remotely relative to /
-    #   delete the remote tar file
+    describe "copying files over" do
 
-    it "uploads files (templating as needed) and runs scripts on the remote server" do
-      pending
+      include FakeFS::SpecHelpers
 
-      # storage.servers.create(name: 'staging-web-7', image_id: 2676, region_id: 1, flavor_id: 33)
+      describe "finding relevant files to zip" do
 
-      # subject.should_receive(:system).with('find . \\( -type f -or -type d -empty \\) -exec tar -czf /tmp/billow/__billow__.tar.gz {} +').twice
+        it "finds all files in the tree" do
+          FileUtils.mkdir_p("/foo/bar/baz")
+          File.write("/foo/bar/baz/quux", "woot")
+          File.write("/foo/bar/baz/zap", "wat")
+          subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
+        end
 
-      # subject.call 'staging-web-7', 'testing'
+        it "finds empty leaf directories in the tree" do
+          FileUtils.mkdir_p("/foo/bar/baz")
+          File.write("/foo/bar/baz/quux", "woot")
+          FileUtils.mkdir_p("/foo/bar/baz/zap")
+          subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
+        end
 
-      # Dir.entries('/tmp/billow/__billow__').should == ['.', '..', 'etc']
-      # File.read('/tmp/billow/__billow__/etc/init/web.conf').should == "env = staging"
+        it "returns dot files" do
+          FileUtils.mkdir_p("/foo/bar/baz")
+          File.write("/foo/bar/baz/.quux", "woot")
+          FileUtils.mkdir_p("/foo/bar/baz/.zap")
+          subject.relevant_files("/").should == ["./foo/bar/baz/.quux", "./foo/bar/baz/.zap"]
+        end
 
-      # scp = storage.servers.first.scp('foo', 'bar').first
-      # ssh1, ssh2, ssh3 = *storage.servers.first.ssh('foo')
+        it "returns relative filenames" do
+          FileUtils.mkdir_p("/foo/bar/baz")
+          File.write("/foo/bar/baz/quux", "woot")
+          FileUtils.mkdir_p("/foo/bar/baz/zap")
+          subject.relevant_files("/foo/bar").should == ["./baz/quux", "./baz/zap"]
+        end
 
-      # [scp, ssh1, ssh2, ssh3].each do |thing|
-      #   thing[:options][:key_data].should == ['foobar']
-      #   thing[:options][:auth_methods].should == ['publickey']
-      # end
+        it "returns relative filenames, even when you add a trailing slash" do
+          FileUtils.mkdir_p("/foo/bar/baz")
+          File.write("/foo/bar/baz/quux", "woot")
+          FileUtils.mkdir_p("/foo/bar/baz/zap")
+          subject.relevant_files("/foo/bar/").should == ["./baz/quux", "./baz/zap"]
+        end
 
-      # scp[:local_path].should == '/tmp/billow/__billow__.tar.gz'
-      # scp[:remote_path].should == '/tmp/__billow__.tar.gz'
+        it "requires an absolute path" do
+          FileUtils.mkdir_p("/foo")
+          expect{ subject.relevant_files("foo") }.to raise_error SystemExit
+        end
 
-      # ssh1[:commands].should == "tar -xzf /tmp/__billow__.tar.gz -C /"
-      # ssh2[:commands].should == "tar -xzf /tmp/__billow__.tar.gz -C /"
-      # ssh3[:commands].should == '/home/web/testing.sh'
+      end
+
+      it "copies file contents into their remote paths" do
+        pending
+
+        File.write("foo", "the contents of foo")
+
+        remote_files = {}
+        extracted_files = []
+        chowned_files = []
+
+        subject.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
+
+          binding.pry
+
+          names = Dir[File.join(in_dir, "**/*")].map! { |n| n.slice! in_dir; n }
+          names.unshift "fake tar list"
+          File.write(out_file, names.join(" - "))
+        end
+
+        server = Object.new
+
+        server.define_singleton_method(:name) { "server-1" }
+
+        server.define_singleton_method(:copy_file) do |local, remote|
+          remote_files[remote] = File.read(local)
+        end
+
+        server.define_singleton_method(:extract_tar) do |remote|
+          extracted_files << remote_files[remote]
+        end
+
+        server.define_singleton_method(:chown_r) do |remote, chowner|
+          chowned_files << [remote, chowner]
+        end
+
+        # without_stdout {
+        subject.copy_file(server, "foo", "/remote/foo")
+        # }
+
+        chowned_files.should == "fake tar list - /remote - /remote/foo"
+        extracted_files.should == nil
+      end
+
+      it "templates files correctly" do
+        pending
+        # File.write('resources/web.conf.erb', "env = <%= server.env %>")
+      end
+
     end
 
   end
