@@ -98,11 +98,13 @@ describe 'billow' do
     end
 
     it "uses unique names for servers" do
-      subject.call 'staging', 'web'
-      subject.call 'production', 'web'
-      subject.call 'staging', 'web'
-      servers = storage.servers
-      servers.map(&:name).should == ['staging-web-1', 'production-web-1', 'staging-web-2']
+      fake_server = Struct.new(:name)
+      servers = [fake_server.new('staging-web-1'),
+                 fake_server.new('production-web-1'),
+                 fake_server.new('staging-web-2')]
+
+      subject.make_unique_server_name("staging", "web", []).should == "staging-web-1"
+      subject.make_unique_server_name("staging", "web", servers).should == "staging-web-3"
     end
 
   end
