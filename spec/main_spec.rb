@@ -5,9 +5,10 @@ require 'net/scp'
 
 SIMPLE_CONFIG = <<CONFIG
 cloud:
-  provider: DigitalOcean
-  digitalocean_api_key: 123
-  digitalocean_client_id: 456
+  provider: AWS
+  aws_access_key_id: 123
+  aws_secret_access_key: 456
+  region: New York 1
 
 envs:
   - staging
@@ -15,11 +16,11 @@ envs:
 
 types:
   web:
-    image: Ubuntu 12.04 x64
-    region: New York 1
-    flavor: 512MB
-    ssh_key: my-ssh-key-name
+    image: ami-1234
+    flavor: m1.small
+    key_pair_name: my-ssh-key-name
     ssh_key_path: resources/my-ssh-key
+    groups: ["web"]
 
 scripts:
   testing:
@@ -43,12 +44,12 @@ describe 'billow' do
     File.open('resources/web.conf.erb', 'w') { |f| f.write("env = <%= server.env %>") }
     File.open('resources/testing.sh', 'w') { |f| f.write("echo hello > world") }
     File.open('resources/my-ssh-key', 'w') { |f| f.write("foobar") }
-    storage.ssh_keys.create(name: 'my-ssh-key-name', ssh_pub_key: 'bla')
   end
 
-  let(:storage) { Fog::Compute.new(provider: "DigitalOcean",
-                                   digitalocean_api_key: "123",
-                                   digitalocean_client_id: "456") }
+  let(:storage) { Fog::Compute.new(provider: "AWS",
+                                   aws_access_key_id: "123",
+                                   aws_secret_access_key: "456",
+                                   region: "New York 1") }
 
   describe Billow::RunScript do
 
