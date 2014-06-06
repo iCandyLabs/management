@@ -30,6 +30,27 @@ scripts:
 CONFIG
 
 
+require 'stringio'
+
+def silence_stdout
+  old = $stdout
+  $stdout = StringIO.new
+  yield
+  $stdout = old
+end
+
+def silence_stderr
+  old = $stderr
+  $stderr = StringIO.new
+  yield
+  $stderr = old
+end
+
+def silence_stdouterr
+  silence_stdout { silence_stderr { yield } }
+end
+
+
 describe 'billow' do
 
   include FakeFS::SpecHelpers
@@ -54,6 +75,8 @@ describe 'billow' do
   describe Billow::RunScript do
 
     it "uploads files (templating as needed) and runs scripts on the remote server" do
+      pending
+
       storage.servers.create(name: 'staging-web-7', image_id: 2676, region_id: 1, flavor_id: 33)
 
       subject.should_receive(:system).with('find . \\( -type f -or -type d -empty \\) -exec tar -czf /tmp/billow/__billow__.tar.gz {} +').twice
@@ -81,20 +104,29 @@ describe 'billow' do
 
   end
 
+  describe Billow::Command do
+
+    it "can safely get config values" do
+      expect { silence_stdouterr { subject.get_env("FAKE") } }.to raise_error SystemExit
+      expect { silence_stdouterr { subject.get_env("staging") } }.to_not raise_error
+
+      expect { silence_stdouterr { subject.get_type("FAKE") } }.to raise_error SystemExit
+      expect { silence_stdouterr { subject.get_type("web") } }.to_not raise_error
+
+      expect { silence_stdouterr { subject.get_script("FAKE") } }.to raise_error SystemExit
+      expect { silence_stdouterr { subject.get_script("testing") } }.to_not raise_error
+    end
+
+  end
+
   describe Billow::CreateServer do
 
     it "creates a new server" do
+      pending
+
       subject.call 'staging', 'web'
       servers = storage.servers
       servers.map(&:name).should == ['staging-web-1']
-    end
-
-    it "requires a valid type" do
-      expect { subject.call 'staging', 'FAKE' }.to raise_error SystemExit
-    end
-
-    it "requires a valid environment" do
-      expect { subject.call 'FAKE', 'web' }.to raise_error SystemExit
     end
 
     it "uses unique names for servers" do
