@@ -30,7 +30,7 @@ module Billow
     end
 
     def copy_file(server, local, remote, opts = nil)
-      p [:copy, server.id, local, remote, opts]
+      p [:copy, server.name, local, remote, opts]
       return
 
       tmpdir = Dir.mktmpdir('billow') # /tmp/billow
@@ -62,7 +62,7 @@ module Billow
       remote_zipfile = "/tmp/#{BILLOW_DIR}.tar.gz" # /tmp/__billow__.tar.gz
 
       # find either the file or empty leaf directory in /tmp/billow/__billow__ and zip it into /tmp/billow/__billow__.tar.gz
-      Dir.chdir(fakeremote_dir) { system("find . \\\( -type f -or -type d -empty \\\) -exec tar -czf #{local_zipfile} {} +") }
+      zip_relevant_files(fakeremote_dir, local_zipfile)
 
       server.scp(local_zipfile, remote_zipfile) # copy /tmp/billow/__billow__.tar.gz to remote /tmp/__billow__.tar.gz
       server.ssh("tar -xzf #{remote_zipfile} -C /")
@@ -73,7 +73,7 @@ module Billow
     end
 
     def run_command(server, cmd)
-      p [:run, server.id, cmd]
+      p [:run, server.name, cmd]
       return
 
       puts "Running #{cmd}"
@@ -92,6 +92,12 @@ module Billow
     end
 
     private
+
+    def zip_relevant_files(in_dir, out_file)
+      Dir.chdir(in_dir) do
+        system("find . \\\( -type f -or -type d -empty \\\) -exec tar -czf #{out_file} {} +")
+      end
+    end
 
     def with_tmp_dir
     end
