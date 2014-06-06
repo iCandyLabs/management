@@ -11,6 +11,8 @@ module Billow
       servers = cloud.servers
       name = make_unique_server_name(env_name, type_name, servers)
 
+      puts "Creating \"#{name}\"..."
+
       cloud.servers.create(image_id: type[:image],
                            flavor_id: type[:flavor],
                            groups: type[:groups],
@@ -23,7 +25,7 @@ module Billow
                              "Meal" => type_name,
                            })
 
-      puts "Created \"#{name}\"."
+      puts "Done."
     end
 
     def current_user
