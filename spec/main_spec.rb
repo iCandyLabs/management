@@ -38,9 +38,9 @@ def without_stderr old = $stderr; $stderr = StringIO.new; yield; $stderr = old e
 
 describe 'billow' do
 
-  describe Billow::Command do
+  before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
 
-    before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
+  describe Billow::Command do
 
     it "can safely get config values" do
       expect { without_stderr { subject.get_env("FAKE") } }.to raise_error SystemExit
