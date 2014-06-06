@@ -154,13 +154,20 @@ describe 'billow' do
 
       it "chowns files correctly when specified" do
         File.write("foo", "hello world")
-        # without_stdout {
-          subject.copy_file(server, "foo", "/remote/foo", chown: "root:nobody")
-        # }
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo", chown: "root:nobody") }
 
         stats = File.stat("/fake-remote-dir/remote/foo")
         Etc.getpwuid(stats.uid).name.should == "root"
         Etc.getgrgid(stats.gid).name.should == "nobody"
+      end
+
+      it "doesn't chown anything unless specified" do
+        File.write("foo", "hello world")
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
+
+        stats = File.stat("/fake-remote-dir/remote/foo")
+        Etc.getpwuid(stats.uid).name.should == `whoami`.chomp
+        Etc.getgrgid(stats.gid).name.should == "staff"
       end
 
     end
