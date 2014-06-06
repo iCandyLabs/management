@@ -116,11 +116,10 @@ above. There's just a few things that might not be obvious:
 3. If a `copy` line has a third entry of `template: true`, then it
    will be run through ERB. The context will have access to `server`
    representing the Fog server, `cloud` representing the Fog::Compute
-   instance, and `configs` representing your configs (via
-   [figgy](https://github.com/pd/figgy)). Also, each Fog server has
-   two new methods: `env` and `type`. NOTE: if you only specified
-   a directory, and it happens to contain `.erb` files, they won't be
-   templated.
+   instance, and `configs` representing your configs (YAML). Also,
+   each Fog server has two new methods: `env` and `type`. NOTE: if you
+   only specified a directory, and it happens to contain `.erb` files,
+   they won't be templated.
 
 4. A `run` line in a script will be run on the remote server. The
    paths represent the remote *absolute* paths. It's your

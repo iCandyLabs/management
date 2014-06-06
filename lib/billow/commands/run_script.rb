@@ -16,7 +16,7 @@ module Billow
       tmpdir = Dir.mktmpdir('billow') # /tmp/billow
       fakeremote_dir = File.join(tmpdir, BILLOW_DIR) # /tmp/billow/__billow__
 
-      type = config.types[server.type]
+      type = config[:types][server.type.to_sym]
       ssh_key_path = type[:ssh_key_path]
       server.private_key_path = ssh_key_path
 
@@ -37,7 +37,7 @@ module Billow
 
           # TODO: fail unless File.exists?(local_file)
 
-          is_template = opts && opts.template
+          is_template = opts && opts[:template]
 
           FileUtils.mkdir_p File.dirname(remote_file) # /tmp/billow/__billow__/etc/init/
           FileUtils.cp_r local_file, remote_file, preserve: true
@@ -56,7 +56,7 @@ module Billow
           server.scp(local_zipfile, remote_zipfile) # copy /tmp/billow/__billow__.tar.gz to remote /tmp/__billow__.tar.gz
           server.ssh("tar -xzf #{remote_zipfile} -C /")
 
-          if chown = opts && opts.chown
+          if chown = opts && opts[:chown]
             server.ssh("chown -R #{chown} #{remote}")
           end
 

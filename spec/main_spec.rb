@@ -3,11 +3,57 @@ require_relative '../lib/billow'
 # require 'net/scp'
 require 'stringio'
 
-silence_stdout = ->{ old = $stdout; $stdout = StringIO.new; yield; $stdout = old }
-silence_stderr = ->{ old = $stderr; $stderr = StringIO.new; yield; $stderr = old }
-silence_stdany = ->{ silence_stdout { silence_stderr { yield } } }
+
+SampleConfig = <<EOC
+cloud:
+  provider: AWS
+  aws_access_key_id: 123
+  aws_secret_access_key: 456
+  region: New York 1
+
+envs:
+  - staging
+  - production
+
+types:
+  web:
+    image: ami-1234
+    flavor: m1.small
+    key_pair_name: my-ssh-key-name
+    ssh_key_path: resources/my-ssh-key
+    groups: ["web"]
+
+scripts:
+  testing:
+    - copy: [resources/testing.sh, /home/web/testing.sh]
+    - copy: [resources/web.conf.erb, /etc/init/web.conf, template: true]
+    - run: /home/web/testing.sh
+EOC
+
+
+def with_stdin(s) old = $stdin; $stdin = StringIO.new(s); yield; $stdin = old end
+def without_stdout old = $stdout; $stdout = StringIO.new; yield; $stdout = old end
+def without_stderr old = $stderr; $stderr = StringIO.new; yield; $stderr = old end
+
 
 describe 'billow' do
+
+  describe Billow::Command do
+
+    before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
+
+    it "can safely get config values" do
+      expect { without_stderr { subject.get_env("FAKE") } }.to raise_error SystemExit
+      expect { without_stderr { subject.get_env("staging") } }.to_not raise_error
+
+      expect { without_stderr { subject.get_type("FAKE") } }.to raise_error SystemExit
+      expect { without_stderr { subject.get_type("web") } }.to_not raise_error
+
+      expect { without_stderr { subject.get_script("FAKE") } }.to raise_error SystemExit
+      expect { without_stderr { subject.get_script("testing") } }.to_not raise_error
+    end
+
+  end
 
   # include FakeFS::SpecHelpers
 
@@ -22,11 +68,6 @@ describe 'billow' do
   #   File.open('resources/testing.sh', 'w') { |f| f.write("echo hello > world") }
   #   File.open('resources/my-ssh-key', 'w') { |f| f.write("foobar") }
   # end
-
-  # let(:storage) { Fog::Compute.new(provider: "AWS",
-  #                                  aws_access_key_id: "123",
-  #                                  aws_secret_access_key: "456",
-  #                                  region: "New York 1") }
 
   describe Billow::RunScript do
 
@@ -60,21 +101,6 @@ describe 'billow' do
 
   end
 
-  describe Billow::Command do
-
-    it "can safely get config values" do
-      expect { silence_stdany { subject.get_env("FAKE") } }.to raise_error SystemExit
-      expect { silence_stdany { subject.get_env("staging") } }.to_not raise_error
-
-      expect { silence_stdany { subject.get_type("FAKE") } }.to raise_error SystemExit
-      expect { silence_stdany { subject.get_type("web") } }.to_not raise_error
-
-      expect { silence_stdany { subject.get_script("FAKE") } }.to raise_error SystemExit
-      expect { silence_stdany { subject.get_script("testing") } }.to_not raise_error
-    end
-
-  end
-
   describe Billow::CreateServer do
 
     it "uses unique names for servers" do
@@ -92,13 +118,17 @@ describe 'billow' do
 
   describe Billow::DestroyServer do
 
-    let(:fake_server) { Object.new }
-    before { subject.stub(:get_server).with("server-1").and_return(fake_server) }
+    let(:server) { Object.new }
+    before { subject.stub(:get_server).with("server-1").and_return(server) }
 
     it "destroys the given server if you type 'Yes' verbatim" do
-      pending
-      fake_server.should_not_receive(:destroy)
-      subject.call("server-1")
+      server.should_receive(:destroy).once
+      with_stdin("Yes\n") { subject.call("server-1") }
+    end
+
+    it "does not destroy the given server if you don't type 'Yes' verbatim" do
+      server.should_not_receive(:destroy)
+      without_stdout { with_stdin("yes\n") { subject.call("server-1") } }
     end
 
   end

@@ -7,10 +7,10 @@ module Billow
     def call(server_name)
       server = get_server(server_name)
 
-      type = config.types[server.type]
+      type = config[:types][server.type.to_sym]
       ssh_key_path = type[:ssh_key_path]
       run "chmod 0600 #{ssh_key_path}"
-      run "ssh -i #{ssh_key_path} #{config.root_user}@#{server.public_ip_address}"
+      run "ssh -i #{ssh_key_path} #{config[:root_user]}@#{server.public_ip_address}"
     end
 
     def run(cmd)

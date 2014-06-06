@@ -1,5 +1,5 @@
 require 'fog'
-require 'figgy'
+require 'yaml'
 
 module Billow
 
@@ -41,15 +41,15 @@ module Billow
 
     def get_env(name)
       return nil if name.nil?
-      config.envs.include?(name) and name or abort "Invalid environment: #{name}"
+      config[:envs].include?(name) and name or abort "Invalid environment: #{name}"
     end
 
     def get_type(name)
-      config.types[name] or abort "Invalid type: #{name}"
+      config[:types][name.to_sym] or abort "Invalid type: #{name}"
     end
 
     def get_script(name)
-      config.scripts[name] or abort "Invalid script: #{name}"
+      config[:scripts][name.to_sym] or abort "Invalid script: #{name}"
     end
 
     def get_server(name)
@@ -57,11 +57,30 @@ module Billow
     end
 
     def config
-      @config ||= Figgy.build{|config| config.root = '.'}.billow_config
+      @config ||= symbolize_keys!(raw_yaml)
     end
 
     def cloud
-      @cloud ||= Fog::Compute.new(config.cloud)
+      @cloud ||= Fog::Compute.new(config[:cloud])
+    end
+
+
+    private
+
+    def raw_yaml
+      YAML.load(File.read("billow_config.yml"))
+    end
+
+    def symbolize_keys! h
+      case h
+      when Hash
+        pairs = h.map { |k, v| [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys!(v)] }
+        return Hash[pairs]
+      when Array
+        return h.map{ |e| symbolize_keys!(e) }
+      else
+        return h
+      end
     end
 
   end
