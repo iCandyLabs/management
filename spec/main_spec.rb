@@ -36,7 +36,6 @@ def with_stdin(s) old = $stdin; $stdin = StringIO.new(s); yield; $stdin = old en
 def without_stdout old = $stdout; $stdout = StringIO.new; yield; $stdout = old end
 def without_stderr old = $stderr; $stderr = StringIO.new; yield; $stderr = old end
 
-
 describe 'billow' do
 
   before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
@@ -106,57 +105,44 @@ describe 'billow' do
 
       end
 
+      # just copy_r the given directory's contents into a new temp dir
+      # and put the filename of that new temp dir into out_file
+      let(:fake_zip_method) { lambda do |in_dir, out_file|
+          zip_dir = Dir.mktmpdir("fake-local-zip-dir")
+          FileUtils.cp_r Dir[File.join(in_dir, "*")], zip_dir
+          File.write(out_file, zip_dir)
+        end }
+
+      # local just contains the name of a dir containing all the files
+      let(:fake_copy_file_method) { lambda do |local, remote|
+          # copying "local" zip file to "remote" zip file
+          fake_remote = File.join("/fake-remote-dir", remote)
+          FileUtils.cp local, fake_remote
+        end }
+
+      let(:fake_extract_tar_method) { lambda do |remote|
+          tar_dir = File.read(File.join("/fake-remote-dir", remote))
+          FileUtils.cp_r(File.join(tar_dir, "*"), "/fake-remote-dir")
+        end }
+
+
       it "copies file contents into their remote paths" do
         File.write("foo", "the contents of foo")
 
-        remote_files = {}
-        extracted_files = []
-        # chowned_files = []
-
-        file_contents = {}
-
-        subject.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
-          names = self.relevant_files(in_dir)
-
-          # add the file contents to check later, when mapping from the remote tar
-          names.each do |name|
-            file_contents[name] = File.read(File.join(in_dir, name))
-          end
-
-          # add a line to prove that this method created this tar file
-          names.unshift "[fake tar list]"
-          File.write(out_file, names.join(" - "))
-        end
+        subject.define_singleton_method(:zip_relevant_files, &fake_zip_method)
 
         server = Object.new
-
         server.define_singleton_method(:name) { "server-1" }
-
-        server.define_singleton_method(:copy_file) do |local, remote|
-          # copying the tar file just puts its contents into a hash representing the remote
-          remote_files[remote] = File.read(local)
-        end
-
-        server.define_singleton_method(:extract_tar) do |remote|
-          # "extract" the tar file's contents into a list
-          extracted_files << remote_files[remote]
-        end
+        server.define_singleton_method(:copy_file, &fake_copy_file_method)
+        server.define_singleton_method(:extract_tar, &fake_extract_tar_method)
 
         server.define_singleton_method(:chown_r) do |remote, chowner|
           # unused in this test (TODO: move into its own test)
-          # chowned_files << [remote, chowner]
         end
 
-        # without_stdout {
-        subject.copy_file(server, "foo", "/remote/foo")
-        # }
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
 
-        extracted_files.should == ["[fake tar list] - ./remote/foo"]
-
-        # get the filenames individually (we don't need the proof-line anymore)
-        file_list = extracted_files.first.split(" - ").drop(1)
-
-        file_list.map{ |path| file_contents[path] }.should == ["the contents of foo"]
+        File.read("/fake-remote-dir/remote/foo").should == "the contents of foo"
       end
 
       it "templates files correctly" do
