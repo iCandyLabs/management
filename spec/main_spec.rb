@@ -107,20 +107,26 @@ describe 'billow' do
       end
 
       it "copies file contents into their remote paths" do
-        pending
+        runner = subject
 
         File.write("foo", "the contents of foo")
 
         remote_files = {}
         extracted_files = []
-        chowned_files = []
+        # chowned_files = []
 
-        subject.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
+        file_contents = {}
 
-          binding.pry
+        runner.define_singleton_method(:zip_relevant_files) do |in_dir, out_file|
+          names = runner.relevant_files(in_dir)
 
-          names = Dir[File.join(in_dir, "**/*")].map! { |n| n.slice! in_dir; n }
-          names.unshift "fake tar list"
+          # add the file contents to check later, when mapping from the remote tar
+          names.each do |name|
+            file_contents[name] = File.read(File.join(in_dir, name))
+          end
+
+          # add a line to prove that this method created this tar file
+          names.unshift "[fake tar list]"
           File.write(out_file, names.join(" - "))
         end
 
@@ -129,23 +135,30 @@ describe 'billow' do
         server.define_singleton_method(:name) { "server-1" }
 
         server.define_singleton_method(:copy_file) do |local, remote|
+          # copying the tar file just puts its contents into a hash representing the remote
           remote_files[remote] = File.read(local)
         end
 
         server.define_singleton_method(:extract_tar) do |remote|
+          # "extract" the tar file's contents into a list
           extracted_files << remote_files[remote]
         end
 
         server.define_singleton_method(:chown_r) do |remote, chowner|
-          chowned_files << [remote, chowner]
+          # unused in this test (TODO: move into its own test)
+          # chowned_files << [remote, chowner]
         end
 
         # without_stdout {
-        subject.copy_file(server, "foo", "/remote/foo")
+        runner.copy_file(server, "foo", "/remote/foo")
         # }
 
-        chowned_files.should == "fake tar list - /remote - /remote/foo"
-        extracted_files.should == nil
+        extracted_files.should == ["[fake tar list] - ./remote/foo"]
+
+        # get the filenames individually (we don't need the proof-line anymore)
+        file_list = extracted_files.first.split(" - ").drop(1)
+
+        file_list.map{ |path| file_contents[path] }.should == ["the contents of foo"]
       end
 
       it "templates files correctly" do
