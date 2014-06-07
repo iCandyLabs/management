@@ -8,7 +8,11 @@ module Billow
     class << self
 
       def all
-        ObjectSpace.each_object(Class).select { |klass| klass < Billow::Command }.sort_by(&:name)
+        @all ||= []
+      end
+
+      def inherited(subclass)
+        all << subclass
       end
 
       def help_string
