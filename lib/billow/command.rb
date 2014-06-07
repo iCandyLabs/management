@@ -15,36 +15,6 @@ module Billow
         all << subclass
       end
 
-      def arg_specs
-        @arg_specs ||= []
-      end
-
-      def arg(type, opts = nil)
-        arg_specs << [type, opts]
-      end
-
-      # is_optional = opts && opts[:optional]
-
-      # p [type, is_optional]
-
-      # TODO:
-      #   @env_name = arg_value (if type at this position == :env)
-      #   @env = get_env(env_name)
-      #   the get_* helper functions can go away and be integrated with this
-      #   valid options: [:optional, :default]
-
-      # - redefine help_string and command_name in terms of self.args
-      # - give each command instance @env and @env_name, etc
-      # - call each command instance's :call method with no args
-      # - give better errors when arguments:
-      #   - dont fit the right type
-      #   - or are omitted
-      #   - or are the right type but arent valid values
-      #
-      # NOTE: this means changing the tests, and it should
-      #       be designed in a way thats still easy to test
-      #       and not hard to mentally trace.
-
       def help_string
         params = instance_method(:call).parameters
 
