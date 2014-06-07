@@ -45,19 +45,24 @@ module Billow
 
     def get_env(name)
       return nil if name.nil?
-      config[:envs].include?(name) and name or abort "Invalid environment: #{name}"
+      config[:envs].include?(name) and name or invalid_selection "Invalid environment: #{name}", config[:envs]
     end
 
     def get_type(name)
-      config[:types][name.to_sym] or abort "Invalid type: #{name}"
+      config[:types][name.to_sym] or invalid_selection "Invalid type: #{name}", config[:types]
     end
 
     def get_script(name)
-      config[:scripts][name.to_sym] or abort "Invalid script: #{name}"
+      config[:scripts][name.to_sym] or invalid_selection "Invalid script: #{name}", config[:scripts]
     end
 
     def get_server(name)
-      cloud.servers.find{|server| server.name == name} or abort "Invalid server: #{name}"
+      servers = cloud.servers
+      servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
+    end
+
+    def invalid_selection(str, selection)
+      abort "#{str}\nValid choices:" + (["\n"] + selection).join("\n - ")
     end
 
     def config
