@@ -42,16 +42,25 @@ describe 'billow' do
 
   describe Billow::Command do
 
-    it "can safely get config values" do
-      expect { without_stderr { subject.get_env("FAKE") } }.to raise_error SystemExit
-      expect { without_stderr { subject.get_env("staging") } }.to_not raise_error
+    describe "safely getting config values" do
 
-      expect { without_stderr { subject.get_type("FAKE") } }.to raise_error SystemExit
-      expect { without_stderr { subject.get_type("web") } }.to_not raise_error
+      it "can get env" do
+        expect { without_stderr { subject.get_env("FAKE") } }.to raise_error SystemExit
+        expect { without_stderr { subject.get_env("staging") } }.to_not raise_error
+      end
 
-      expect { without_stderr { subject.get_script("FAKE") } }.to raise_error SystemExit
-      expect { without_stderr { subject.get_script("testing") } }.to_not raise_error
+      it "can get type" do
+        expect { without_stderr { subject.get_type("FAKE") } }.to raise_error SystemExit
+        expect { without_stderr { subject.get_type("web") } }.to_not raise_error
+      end
+
+      it "can get script" do
+        expect { without_stderr { subject.get_script("FAKE") } }.to raise_error SystemExit
+        expect { without_stderr { subject.get_script("testing") } }.to_not raise_error
+      end
+
     end
+
 
   end
 

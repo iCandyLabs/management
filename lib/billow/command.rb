@@ -49,11 +49,11 @@ module Billow
     end
 
     def get_type(name)
-      config[:types][name.to_sym] or invalid_selection "Invalid type: #{name}", config[:types]
+      config[:types][name.to_sym] or invalid_selection "Invalid type: #{name}", config[:types].map(&:first)
     end
 
     def get_script(name)
-      config[:scripts][name.to_sym] or invalid_selection "Invalid script: #{name}", config[:scripts]
+      config[:scripts][name.to_sym] or invalid_selection "Invalid script: #{name}", config[:scripts].map(&:first)
     end
 
     def get_server(name)
