@@ -8,4 +8,5 @@ group :test do
   gem 'pry'
   gem 'fakefs'
   gem 'rspec'
+  gem 'guard-rspec'
 end
