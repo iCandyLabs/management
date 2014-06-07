@@ -28,7 +28,7 @@ module Billow
           all_args = chosen_command.instance_method(:call).parameters
           req_args = all_args.map(&:first).take_while{|p| p == :req}
 
-          case args.count
+          case
           when args.count < req_args.count
             puts "Error: not enough arguments"
             abort parser.help
