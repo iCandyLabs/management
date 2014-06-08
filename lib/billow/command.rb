@@ -61,10 +61,6 @@ module Billow
       servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
     end
 
-    def invalid_selection(str, selection)
-      abort "#{str}\nValid choices:" + (["\n"] + selection).join("\n - ")
-    end
-
     def config
       @config ||= symbolize_keys!(raw_yaml)
     end
@@ -78,6 +74,10 @@ module Billow
 
     def raw_yaml
       YAML.load(File.read("billow_config.yml"))
+    end
+
+    def invalid_selection(str, selection)
+      abort "#{str}\nValid choices:" + (["\n"] + selection).join("\n - ")
     end
 
     def symbolize_keys! h
