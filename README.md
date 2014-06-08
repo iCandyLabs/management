@@ -56,21 +56,22 @@ Put this in `billow_config.yml':
 
 ```yaml
 cloud:  # NOTE: this just gets passed to Fog::Compute.new
-  provider: DigitalOcean
-  digitalocean_api_key: 123
-  digitalocean_client_id: 456
+  provider: AWS
+  aws_access_key_id: 123
+  aws_secret_access_key: 456
+  region: New York 1
 
 envs:
   - staging
   - production
 
 types:
-  web:
-    image: Ubuntu 12.04 x64
-    region: New York 1
-    flavor: 512MB
-    ssh_key: my-ssh-key-name
-    ssh_key_path: resources/keys/id_rsa_digitalocean
+  web:  # NOTE: this just gets passed to compute.servers.create
+    image_id: ami-1234
+    flavor_id: m1.small
+    key_name: my-ssh-key-name
+    groups: ["web"]
+    ssh_key_path: resources/my-ssh-key
 
 scripts:
   setup-web:

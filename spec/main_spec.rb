@@ -18,11 +18,11 @@ envs:
 
 types:
   web:
-    image: ami-1234
-    flavor: m1.small
-    key_pair_name: my-ssh-key-name
-    ssh_key_path: resources/my-ssh-key
+    image_id: ami-1234
+    flavor_id: m1.small
+    key_name: my-ssh-key-name
     groups: ["web"]
+    ssh_key_path: resources/my-ssh-key
 
 scripts:
   testing:
