@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/management.rb'
-Management::Interpreter.interpret! ARGV.dup
+args = ARGV.dup
+ARGV.clear
+Management::Interpreter.interpret! args

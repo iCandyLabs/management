@@ -22,7 +22,6 @@ module Management
 
         args = parser.parse(input)
         task = args.shift
-        ARGV.clear
 
         if chosen_command = commands.find{|c|c.command_name == task}
           all_args = chosen_command.instance_method(:call).parameters
