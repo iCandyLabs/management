@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors       = ["Steven Degutis"]
   s.homepage      = 'https://github.com/sdegutis/management'
   s.license       = 'MIT'
-  s.summary       = "Minimalist EC2 management & deployment tool."
-  s.description   = "Write your deployment using just shell scripts."
+  s.summary       =
+  s.description   = "Minimalist EC2 configuration & deployment tool."
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- spec/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
