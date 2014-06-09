@@ -4,9 +4,9 @@ require 'fileutils'
 require 'erb'
 require 'shellwords'
 
-module Billow
+module Management
 
-  class RunScript < Billow::Command
+  class RunScript < Management::Command
 
     def call(server_name, script_name)
       server = get_server(server_name)
@@ -37,7 +37,7 @@ module Billow
 
       puts "Copying #{local_path} -> #{remote_path}"
 
-      Dir.mktmpdir('billow-file-dir') do |file_tmpdir|
+      Dir.mktmpdir('management-file-dir') do |file_tmpdir|
 
         # copy to the fake "remote" path locally
         remote_looking_path = File.join(file_tmpdir, remote_path)
@@ -50,14 +50,14 @@ module Billow
           File.write(remote_looking_path, new_contents)
         end
 
-        Dir.mktmpdir('billow-tar-dir') do |tar_tmpdir|
+        Dir.mktmpdir('management-tar-dir') do |tar_tmpdir|
 
           # zip this file up, starting from its absolute path
-          local_tar_path = File.join(tar_tmpdir, "__billow__.tar.gz")
+          local_tar_path = File.join(tar_tmpdir, "__management__.tar.gz")
           zip_relevant_files(file_tmpdir, local_tar_path)
 
           # copy tar file to remote and extract
-          remote_tar_path = "/tmp/__billow__.tar.gz"
+          remote_tar_path = "/tmp/__management__.tar.gz"
           server.copy_file(local_tar_path, remote_tar_path)
           server.extract_tar(remote_tar_path)
           server.chown_r(remote_path, custom_chown) if custom_chown

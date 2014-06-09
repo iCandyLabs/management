@@ -54,7 +54,7 @@ end
 
 
 require 'fog/compute/models/server'
-# we're assuming the servers were created via boucher or billow
+# we're assuming the servers were created via boucher or management
 class Fog::Compute::Server
   def env;  tags["Env"]; end
   def type; tags["Meal"]; end

@@ -1,4 +1,4 @@
-require_relative '../lib/billow'
+require_relative '../lib/management'
 require 'fakefs/spec_helpers'
 require 'stringio'
 require 'pry'
@@ -36,11 +36,11 @@ def with_stdin(s) old = $stdin; $stdin = StringIO.new(s); yield; $stdin = old en
 def without_stdout old = $stdout; $stdout = StringIO.new; yield; $stdout = old end
 def without_stderr old = $stderr; $stderr = StringIO.new; yield; $stderr = old end
 
-describe 'billow' do
+describe 'management' do
 
   before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
 
-  describe Billow::Command do
+  describe Management::Command do
 
     describe "safely getting config values" do
 
@@ -64,7 +64,7 @@ describe 'billow' do
 
   end
 
-  describe Billow::RunScript do
+  describe Management::RunScript do
 
     include FakeFS::SpecHelpers
 
@@ -200,7 +200,7 @@ describe 'billow' do
 
   end
 
-  describe Billow::CreateServer do
+  describe Management::CreateServer do
 
     it "uses unique names for servers" do
       fake_server = Struct.new(:name)
@@ -215,7 +215,7 @@ describe 'billow' do
 
   end
 
-  describe Billow::DestroyServer do
+  describe Management::DestroyServer do
 
     let(:server) { Object.new }
     before { subject.stub(:get_server).with("server-1").and_return(server) }
@@ -240,7 +240,7 @@ describe 'billow' do
 
   end
 
-  describe Billow::StopServer do
+  describe Management::StopServer do
 
     let(:server) { Object.new }
     before { subject.stub(:get_server).with("server-1").and_return(server) }

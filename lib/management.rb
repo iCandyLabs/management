@@ -1,0 +1,10 @@
+require_relative 'ext/fog'
+
+require_relative 'management/version'
+require_relative 'management/interpreter'
+require_relative 'management/commands/create_server'
+require_relative 'management/commands/list_servers'
+require_relative 'management/commands/destroy_server'
+require_relative 'management/commands/run_script'
+require_relative 'management/commands/ssh_server'
+require_relative 'management/commands/stop_server'

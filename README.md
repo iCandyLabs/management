@@ -1,15 +1,15 @@
-## billow
+## Management
 
-Minimalist EC2 management & deployment tool.
+Minimalist EC2 configuration & deployment tool.
 
 - Version: **0.3**
 
-![build status](https://travis-ci.org/sdegutis/billow.svg?branch=master)
+![build status](https://travis-ci.org/sdegutis/management.svg?branch=master)
 
 #### Usage
 
 ```
-$ billow
+$ management
 Usage:
 
        create-server <env> <type>
@@ -21,17 +21,17 @@ Usage:
     -h, --help                       Display this screen
     -v, --version                    Show version
 
-$ billow list-servers
+$ management list-servers
 
-$ billow create-server staging web
+$ management create-server staging web
 Created "staging-web-1".
 
-$ billow list-servers
+$ management list-servers
 Name             State       IP                    Private IP
 ---------------  ----------  --------------------  --------------------
 staging-db-1     active      107.170.80.230        10.128.198.115
 
-$ billow run-script staging-web-1 setup-web
+$ management run-script staging-web-1 setup-web
 Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
 Running /home/webapp/bootstrap_base.sh
 [...snip...]
@@ -52,7 +52,7 @@ project may be right for you.
 
 #### Setup
 
-Put this in `billow_config.yml':
+Put this in `management_config.yml':
 
 ```yaml
 cloud:  # NOTE: this just gets passed to Fog::Compute.new
@@ -83,14 +83,14 @@ scripts:
     - run: /home/webapp/start_web_server.sh
 ```
 
-Billow doesn't care where any of your files are, with the exception of
-`billow_config.yml`, which it expects to be in your project's
+Management doesn't care where any of your files are, with the exception of
+`management_config.yml`, which it expects to be in your project's
 root. Here's the relevant part of the file structure that the above
 sample config assumes:
 
 ```
 ./my-project
-|-- billow_config.yml
+|-- management_config.yml
 `-- resources
     |-- files
     |   |-- nginx.conf
@@ -108,7 +108,7 @@ sample config assumes:
 Most of how it works should be self-explanatory from the examples
 above. There's just a few things that might not be obvious:
 
-1. Billow assumes it's only dealing with servers it created. So it
+1. Management assumes it's only dealing with servers it created. So it
    assumes that the name will be in the "{env}-{type}-{n}"
    format. But that's really all it assumes.
 

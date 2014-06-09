@@ -73,7 +73,7 @@ module Billow
     private
 
     def raw_yaml
-      YAML.load(File.read("billow_config.yml"))
+      YAML.load(File.read("management_config.yml"))
     end
 
     def invalid_selection(str, selection)

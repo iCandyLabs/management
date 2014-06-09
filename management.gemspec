@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "billow/version"
+require "management/version"
 
 Gem::Specification.new do |s|
-  s.name          = 'billow'
-  s.version       = Billow::VERSION
+  s.name          = 'management'
+  s.version       = Management::VERSION
   s.email         = 'steven@cleancoders.com'
   s.authors       = ["Steven Degutis"]
-  s.homepage      = 'https://github.com/sdegutis/billow'
+  s.homepage      = 'https://github.com/sdegutis/management'
   s.license       = 'MIT'
   s.summary       = "Minimalist EC2 management & deployment tool."
   s.description   = "Write your deployment using just shell scripts."

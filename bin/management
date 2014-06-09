@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/management.rb'
+Management::Interpreter.interpret! ARGV.dup
