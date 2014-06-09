@@ -20,7 +20,9 @@ module Management
 
     def get_server(name)
       servers = cloud.servers
-      servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
+      server = servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
+      server.username = config[:root_user] if server && config[:root_user]
+      server
     end
 
     def config
