@@ -65,10 +65,10 @@ class Fog::Compute::Server
   end
 
   def extract_tar(remote_tar_path)
-    ssh("tar -xzf #{remote_tar_path} -C /")
+    ssh("sudo tar -xzf #{remote_tar_path} -C /")
   end
 
   def chown_r(remote_path, chown)
-    ssh("chown -R #{chown} #{remote_path}")
+    ssh("sudo chown -R #{chown} #{remote_path}")
   end
 end
