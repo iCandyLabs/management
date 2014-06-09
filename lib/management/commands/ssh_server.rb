@@ -15,11 +15,6 @@ module Management
       system_verbose "ssh -i #{ssh_key_path} #{config[:root_user]}@#{server.public_ip_address}"
     end
 
-    def system_verbose(cmd)
-      puts "Running: #{cmd}"
-      system cmd
-    end
-
   end
 
 end

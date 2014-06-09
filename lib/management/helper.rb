@@ -33,6 +33,11 @@ module Management
       @cloud ||= Fog::Compute.new(config[:cloud])
     end
 
+    def system_verbose(cmd)
+      puts "Running: #{cmd}"
+      system cmd
+    end
+
 
     private
 
