@@ -1,6 +1,6 @@
 ## billow
 
-Minimalist generic deployment tool.
+Minimalist EC2 management & deployment tool.
 
 - Version: **0.3**
 
