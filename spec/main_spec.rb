@@ -38,7 +38,7 @@ def without_stderr old = $stderr; $stderr = StringIO.new; yield; $stderr = old e
 
 describe 'management' do
 
-  before { subject.stub(:raw_yaml).and_return(YAML.load(SampleConfig)) }
+  before { subject.define_singleton_method(:raw_yaml) { YAML.load(SampleConfig) } }
 
   describe Management::Command do
 
@@ -74,35 +74,35 @@ describe 'management' do
         FileUtils.mkdir_p("/foo/bar/baz")
         File.write("/foo/bar/baz/quux", "woot")
         File.write("/foo/bar/baz/zap", "wat")
-        subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
+        expect( subject.relevant_files("/") ).to eq ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
       end
 
       it "finds empty leaf directories in the tree" do
         FileUtils.mkdir_p("/foo/bar/baz")
         File.write("/foo/bar/baz/quux", "woot")
         FileUtils.mkdir_p("/foo/bar/baz/zap")
-        subject.relevant_files("/").should == ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
+        expect( subject.relevant_files("/") ).to eq ["./foo/bar/baz/quux", "./foo/bar/baz/zap"]
       end
 
       it "returns dot files" do
         FileUtils.mkdir_p("/foo/bar/baz")
         File.write("/foo/bar/baz/.quux", "woot")
         FileUtils.mkdir_p("/foo/bar/baz/.zap")
-        subject.relevant_files("/").should == ["./foo/bar/baz/.quux", "./foo/bar/baz/.zap"]
+        expect( subject.relevant_files("/") ).to eq ["./foo/bar/baz/.quux", "./foo/bar/baz/.zap"]
       end
 
       it "returns relative filenames" do
         FileUtils.mkdir_p("/foo/bar/baz")
         File.write("/foo/bar/baz/quux", "woot")
         FileUtils.mkdir_p("/foo/bar/baz/zap")
-        subject.relevant_files("/foo/bar").should == ["./baz/quux", "./baz/zap"]
+        expect( subject.relevant_files("/foo/bar") ).to eq ["./baz/quux", "./baz/zap"]
       end
 
       it "returns relative filenames, even when you add a trailing slash" do
         FileUtils.mkdir_p("/foo/bar/baz")
         File.write("/foo/bar/baz/quux", "woot")
         FileUtils.mkdir_p("/foo/bar/baz/zap")
-        subject.relevant_files("/foo/bar/").should == ["./baz/quux", "./baz/zap"]
+        expect( subject.relevant_files("/foo/bar/") ).to eq ["./baz/quux", "./baz/zap"]
       end
 
       it "requires an absolute path" do
@@ -152,13 +152,13 @@ describe 'management' do
       it "copies file contents into their remote paths" do
         File.write("foo", "the contents of foo")
         without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
-        File.read("/fake-remote-dir/remote/foo").should == "the contents of foo"
+        expect( File.read("/fake-remote-dir/remote/foo") ).to eq "the contents of foo"
       end
 
       it "templates files correctly" do
         File.write("foo", "the contents of <%= server.env %>")
         without_stdout { subject.copy_file(server, "foo", "/remote/foo", template: true) }
-        File.read("/fake-remote-dir/remote/foo").should == "the contents of staging"
+        expect( File.read("/fake-remote-dir/remote/foo") ).to eq "the contents of staging"
       end
 
       it "chowns files correctly when specified" do
@@ -169,8 +169,8 @@ describe 'management' do
         without_stdout { subject.copy_file(server, "foo", "/remote/foo", chown: "#{user}:#{group}") }
 
         stats = File.stat("/fake-remote-dir/remote/foo")
-        Etc.getpwuid(stats.uid).name.should == user
-        Etc.getgrgid(stats.gid).name.should == group
+        expect( Etc.getpwuid(stats.uid).name ).to eq user
+        expect( Etc.getgrgid(stats.gid).name ).to eq group
       end
 
       it "doesn't chown anything unless specified" do
@@ -178,14 +178,14 @@ describe 'management' do
         without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
 
         stats = File.stat("/fake-remote-dir/remote/foo")
-        Etc.getpwuid(stats.uid).name.should == `id -un`.chomp
-        Etc.getgrgid(stats.gid).name.should == `id -gn`.chomp
+        expect( Etc.getpwuid(stats.uid).name ).to eq `id -un`.chomp
+        expect( Etc.getgrgid(stats.gid).name ).to eq `id -gn`.chomp
       end
 
       it "fails if multiple local paths don't exist" do
         script = subject.get_script("testing")
         list = subject.missing_local_files(script)
-        list.should == ["resources/testing.sh", "resources/web.conf.erb"]
+        expect(list).to eq ["resources/testing.sh", "resources/web.conf.erb"]
       end
 
       it "fails if a single local path doesn't exist" do
@@ -193,7 +193,7 @@ describe 'management' do
         File.write "resources/testing.sh", "hello world"
         script = subject.get_script("testing")
         list = subject.missing_local_files(script)
-        list.should == ["resources/web.conf.erb"]
+        expect(list).to eq ["resources/web.conf.erb"]
       end
 
     end
@@ -208,9 +208,9 @@ describe 'management' do
                  fake_server.new('production-web-1'),
                  fake_server.new('staging-web-2')]
 
-      subject.make_unique_server_name("staging", "web", []).should == "staging-web-1"
-      subject.make_unique_server_name("staging", "web", servers).should == "staging-web-3"
-      subject.make_unique_server_name("production", "web", servers).should == "production-web-2"
+      expect( subject.make_unique_server_name("staging", "web", []) ).to eq "staging-web-1"
+      expect( subject.make_unique_server_name("staging", "web", servers) ).to eq "staging-web-3"
+      expect( subject.make_unique_server_name("production", "web", servers) ).to eq "production-web-2"
     end
 
   end
@@ -218,15 +218,18 @@ describe 'management' do
   describe Management::DestroyServer do
 
     let(:server) { Object.new }
-    before { subject.stub(:get_server).with("server-1").and_return(server) }
+    before do
+      s = server # lol Ruby
+      subject.define_singleton_method(:get_server) { |arg| return s if arg == "server-1" }
+    end
 
     it "destroys the given server if you type 'Yes' verbatim" do
-      server.should_receive(:destroy).once
+      expect(server).to receive(:destroy).once
       with_stdin("Yes\n") { without_stdout { subject.call("server-1") } }
     end
 
     it "does not destroy the given server if you don't type 'Yes' verbatim" do
-      server.should_not_receive(:destroy)
+      expect(server).not_to receive(:destroy)
       without_stdout do
         with_stdin("yes\n") { subject.call("server-1") }
         with_stdin("Y\n") { subject.call("server-1") }
@@ -243,11 +246,14 @@ describe 'management' do
   describe Management::StopServer do
 
     let(:server) { Object.new }
-    before { subject.stub(:get_server).with("server-1").and_return(server) }
+    before do
+      s = server # lol Ruby
+      subject.define_singleton_method(:get_server) { |arg| return s if arg == "server-1" }
+    end
 
     it "stops the given server" do
-      server.should_not_receive(:destroy)
-      server.should_receive(:stop).once
+      expect(server).not_to receive(:destroy)
+      expect(server).to receive(:stop).once
       without_stdout { subject.call("server-1") }
     end
 
