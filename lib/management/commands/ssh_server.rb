@@ -1,8 +1,8 @@
 require_relative '../command'
 
-module Billow
+module Management
 
-  class SshServer < Billow::Command
+  class SshServer < Management::Command
 
     def call(server_name)
       server = get_server(server_name)

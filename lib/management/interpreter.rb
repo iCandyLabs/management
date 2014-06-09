@@ -1,13 +1,13 @@
 require 'optparse'
 
-module Billow
+module Management
 
   class Interpreter
 
     class << self
 
       def interpret!(input)
-        commands = Billow::Command.all
+        commands = Management::Command.all
 
         parser = OptionParser.new do |opts|
           opts.banner = "Usage:"
@@ -15,7 +15,7 @@ module Billow
           commands.each { |cmd| opts.separator cmd.help_string }
           opts.separator('')
           opts.on('-h', '--help', 'Display this screen') { puts opts; exit }
-          opts.on('-v', '--version', 'Show version') { puts Billow::VERSION; exit }
+          opts.on('-v', '--version', 'Show version') { puts Management::VERSION; exit }
         end
 
         abort parser.help if input.empty?

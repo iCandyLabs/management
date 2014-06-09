@@ -1,8 +1,8 @@
 require_relative '../command'
 
-module Billow
+module Management
 
-  class ListServers < Billow::Command
+  class ListServers < Management::Command
 
     def call(env_name = nil)
       env = get_env(env_name)

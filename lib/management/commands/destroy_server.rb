@@ -1,8 +1,8 @@
 require_relative '../command'
 
-module Billow
+module Management
 
-  class DestroyServer < Billow::Command
+  class DestroyServer < Management::Command
 
     def call(server_name)
       server = get_server(server_name)

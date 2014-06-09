@@ -1,7 +1,7 @@
 require 'fog'
 require 'yaml'
 
-module Billow
+module Management
 
   class Command
 
