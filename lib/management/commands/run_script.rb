@@ -8,6 +8,8 @@ module Management
 
   class RunScript < Management::Command
 
+    include Management::Helper
+
     def call(server_name, script_name)
       server = get_server(server_name)
       script = get_script(script_name)

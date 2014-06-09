@@ -40,7 +40,9 @@ describe 'management' do
 
   before { subject.define_singleton_method(:raw_yaml) { YAML.load(SampleConfig) } }
 
-  describe Management::Command do
+  describe Management::Helper do
+
+    subject { Object.new.extend Management::Helper }
 
     describe "safely getting config values" do
 

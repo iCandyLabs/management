@@ -4,6 +4,8 @@ module Management
 
   class ListServers < Management::Command
 
+    include Management::Helper
+
     def call(env_name = nil)
       env = get_env(env_name)
 

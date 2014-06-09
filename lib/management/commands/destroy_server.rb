@@ -4,6 +4,8 @@ module Management
 
   class DestroyServer < Management::Command
 
+    include Management::Helper
+
     def call(server_name)
       server = get_server(server_name)
 

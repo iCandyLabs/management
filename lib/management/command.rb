@@ -1,95 +1,42 @@
-require 'fog'
-require 'yaml'
-
 module Management
 
   class Command
 
-    class << self
-
-      def all
-        @all ||= []
-      end
-
-      def inherited(subclass)
-        all << subclass
-      end
-
-      def help_string
-        params = instance_method(:call).parameters
-
-        output = sprintf("%20s ", command_name)
-        args = []
-
-        params.each do |req, name|
-          name = "<#{name.to_s.sub('_name', '')}>"
-          if req == :opt
-            name = "[#{name}]"
-          end
-          args << name
-        end
-
-        return output + args.join(' ')
-      end
-
-      def command_name
-        self.name.split('::').last.
-          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-          gsub(/([a-z\d])([A-Z])/,'\1_\2').
-          tr("_", "-").
-          downcase
-      end
-
+    def self.all
+      @all ||= []
     end
 
-
-    def get_env(name)
-      return nil if name.nil?
-      config[:envs].include?(name) and name or invalid_selection "Invalid environment: #{name}", config[:envs]
+    def self.inherited(subclass)
+      all << subclass.new
     end
 
-    def get_type(name)
-      config[:types][name.to_sym] or invalid_selection "Invalid type: #{name}", config[:types].map(&:first)
+    def fn
+      method(:call)
     end
 
-    def get_script(name)
-      config[:scripts][name.to_sym] or invalid_selection "Invalid script: #{name}", config[:scripts].map(&:first)
+    def command_name
+      self.class.name.split('::').last.
+        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+        gsub(/([a-z\d])([A-Z])/,'\1_\2').
+        tr("_", "-").
+        downcase
     end
 
-    def get_server(name)
-      servers = cloud.servers
-      servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
+    def help_string
+      return sprintf("%20s ", self.command_name) + fn.parameters.map do |req, name|
+        name = "<#{name.to_s.sub('_name', '')}>"
+        req == :opt ? "[#{name}]" : name
+      end.join(' ')
     end
 
-    def config
-      @config ||= symbolize_keys!(raw_yaml)
-    end
+    def call_with(args, error_handler)
+      num_all_args = fn.parameters.count
+      num_req_args = fn.arity
 
-    def cloud
-      @cloud ||= Fog::Compute.new(config[:cloud])
-    end
+      error_handler.call "not enough arguments" if args.count < num_req_args
+      error_handler.call "too many arguments"   if args.count > num_all_args
 
-
-    private
-
-    def raw_yaml
-      YAML.load(File.read("management_config.yml"))
-    end
-
-    def invalid_selection(str, selection)
-      abort "#{str}\nValid choices:" + (["\n"] + selection).join("\n - ")
-    end
-
-    def symbolize_keys! h
-      case h
-      when Hash
-        pairs = h.map { |k, v| [k.respond_to?(:to_sym) ? k.to_sym : k, symbolize_keys!(v)] }
-        return Hash[pairs]
-      when Array
-        return h.map{ |e| symbolize_keys!(e) }
-      else
-        return h
-      end
+      fn.call *args
     end
 
   end

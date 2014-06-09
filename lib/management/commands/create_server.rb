@@ -4,6 +4,8 @@ module Management
 
   class CreateServer < Management::Command
 
+    include Management::Helper
+
     def call(env_name, type_name)
       env = get_env(env_name)
       type = get_type(type_name)
