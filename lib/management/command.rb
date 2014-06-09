@@ -11,7 +11,7 @@ module Management
     end
 
     def fn
-      method(:call)
+      method(:run)
     end
 
     def command_name

@@ -10,7 +10,7 @@ module Management
 
     include Management::Helper
 
-    def call(server_name, script_name)
+    def run(server_name, script_name)
       server = get_server(server_name)
       script = get_script(script_name)
 
@@ -26,7 +26,7 @@ module Management
         when :copy
           copy_file(server, *data)
         when :run
-          run_command(server, data)
+          run_remote_command(server, data)
         end
 
       end
@@ -70,7 +70,7 @@ module Management
 
     end
 
-    def run_command(server, cmd)
+    def run_remote_command(server, cmd)
       puts "Running #{cmd}"
 
       result = server.ssh("#{cmd}").first

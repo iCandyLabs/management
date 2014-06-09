@@ -6,7 +6,7 @@ module Management
 
     include Management::Helper
 
-    def call(env_name = nil)
+    def run(env_name = nil)
       env = get_env(env_name)
 
       cols = [

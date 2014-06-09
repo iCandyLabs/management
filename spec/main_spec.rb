@@ -224,19 +224,19 @@ describe 'management' do
 
     it "destroys the given server if you type 'Yes' verbatim" do
       expect(server).to receive(:destroy).once
-      with_stdin("Yes\n") { without_stdout { subject.call("server-1") } }
+      with_stdin("Yes\n") { without_stdout { subject.run("server-1") } }
     end
 
     it "does not destroy the given server if you don't type 'Yes' verbatim" do
       expect(server).not_to receive(:destroy)
       without_stdout do
-        with_stdin("yes\n") { subject.call("server-1") }
-        with_stdin("Y\n") { subject.call("server-1") }
-        with_stdin("y\n") { subject.call("server-1") }
-        with_stdin("yep\n") { subject.call("server-1") }
-        with_stdin("\n") { subject.call("server-1") }
-        with_stdin("YES\n") { subject.call("server-1") }
-        with_stdin("Yes.\n") { subject.call("server-1") }
+        with_stdin("yes\n") { subject.run("server-1") }
+        with_stdin("Y\n") { subject.run("server-1") }
+        with_stdin("y\n") { subject.run("server-1") }
+        with_stdin("yep\n") { subject.run("server-1") }
+        with_stdin("\n") { subject.run("server-1") }
+        with_stdin("YES\n") { subject.run("server-1") }
+        with_stdin("Yes.\n") { subject.run("server-1") }
       end
     end
 
@@ -250,7 +250,7 @@ describe 'management' do
     it "stops the given server" do
       expect(server).not_to receive(:destroy)
       expect(server).to receive(:stop).once
-      without_stdout { subject.call("server-1") }
+      without_stdout { subject.run("server-1") }
     end
 
   end
