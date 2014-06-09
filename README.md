@@ -10,11 +10,14 @@ Minimalist EC2 configuration & deployment tool.
 
 ```
 $ management
-Usage:
+Usage: management [command] [args*]
 
+Commands:
        create-server <env> <type>
-      destroy-server <server>
         list-servers [<env>]
+      destroy-server <server>
+        start-server <server>
+         stop-server <server>
           run-script <server> <script>
           ssh-server <server>
 
@@ -22,14 +25,19 @@ Usage:
     -v, --version                    Show version
 
 $ management list-servers
+Name                  State       IP                    Private IP            Size        Env              Type             EC2 ID
+--------------------  ----------  --------------------  --------------------  ----------  ---------------  ---------------  -----------
+
 
 $ management create-server staging web
 Created "staging-web-1".
 
+
 $ management list-servers
-Name             State       IP                    Private IP
----------------  ----------  --------------------  --------------------
-staging-db-1     active      107.170.80.230        10.128.198.115
+Name                  State       IP                    Private IP            Size        Env              Type             EC2 ID
+--------------------  ----------  --------------------  --------------------  ----------  ---------------  ---------------  -----------
+staging-web-1         running     101.102.103.104       1.2.3.4               m1.large    staging          db               i-12341234
+
 
 $ management run-script staging-web-1 setup-web
 Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
