@@ -6,6 +6,10 @@ Minimalist EC2 configuration & deployment tool.
 
 ![build status](https://travis-ci.org/sdegutis/management.svg?branch=master)
 
+#### Install
+
+`gem install management`
+
 #### Usage
 
 ```
