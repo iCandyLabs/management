@@ -114,7 +114,7 @@ describe 'management' do
 
     describe "copying files over" do
 
-      let(:server) { Object.new }
+      let(:server) { double 'server' }
 
       before(:each) do
 
@@ -217,11 +217,8 @@ describe 'management' do
 
   describe Management::DestroyServer do
 
-    let(:server) { Object.new }
-    before do
-      s = server # lol Ruby
-      subject.define_singleton_method(:get_server) { |arg| return s if arg == "server-1" }
-    end
+    let(:server) { double "server" }
+    before { allow(subject).to receive(:get_server).with("server-1").and_return(server) }
 
     it "destroys the given server if you type 'Yes' verbatim" do
       expect(server).to receive(:destroy).once
@@ -245,11 +242,8 @@ describe 'management' do
 
   describe Management::StopServer do
 
-    let(:server) { Object.new }
-    before do
-      s = server # lol Ruby
-      subject.define_singleton_method(:get_server) { |arg| return s if arg == "server-1" }
-    end
+    let(:server) { double "server" }
+    before { allow(subject).to receive(:get_server).with("server-1").and_return(server) }
 
     it "stops the given server" do
       expect(server).not_to receive(:destroy)
