@@ -15,17 +15,13 @@ module Management
 
       puts "Creating \"#{name}\"..."
 
-      cloud.servers.create(image_id: type[:image_id],
-                           flavor_id: type[:flavor_id],
-                           groups: type[:groups],
-                           key_name: type[:key_name],
-                           tags: {
-                             "Creator" => current_user,
-                             "CreatedAt" => Time.new.strftime("%Y%m%d%H%M%S"),
-                             "Name" => name,
-                             "Env" => env_name,
-                             "Meal" => type_name,
-                           })
+      cloud.servers.create(type.merge({tags: {
+                                          "Creator" => current_user,
+                                          "CreatedAt" => Time.new.strftime("%Y%m%d%H%M%S"),
+                                          "Name" => name,
+                                          "Env" => env_name,
+                                          "Meal" => type_name,
+                                        }}))
 
       puts "Done."
     end
