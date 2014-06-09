@@ -19,10 +19,14 @@ module Management
     end
 
     def get_server(name)
-      servers = cloud.servers
+      servers = live_servers
       server = servers.find{|server| server.name == name} or invalid_selection "Invalid server: #{name}", servers.map(&:name)
       server.username = config[:root_user] if server && config[:root_user]
       server
+    end
+
+    def live_servers
+      cloud.servers.reject{ |s| s.state == 'terminated' }
     end
 
     def config

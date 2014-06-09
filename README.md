@@ -2,7 +2,7 @@
 
 Minimalist EC2 configuration & deployment tool.
 
-- Version: **0.9**
+- Version: **1.0**
 
 ![build status](https://travis-ci.org/sdegutis/management.svg?branch=master)
 

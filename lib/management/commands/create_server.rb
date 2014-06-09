@@ -10,7 +10,7 @@ module Management
       env = get_env(env_name)
       type = get_type(type_name)
 
-      servers = cloud.servers
+      servers = live_servers
       name = make_unique_server_name(env_name, type_name, servers)
 
       puts "Creating \"#{name}\"..."

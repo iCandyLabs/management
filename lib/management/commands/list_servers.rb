@@ -25,7 +25,7 @@ module Management
       send :printf, *([format].concat(cols.map{|c|c[:title]}))
       send :printf, *([format].concat(cols.map{|c|'-' * c[:size]}))
 
-      servers = cloud.servers.sort_by(&:name)
+      servers = live_servers.sort_by(&:name)
 
       servers.each do |server|
         next if env_name && server.env != env_name
