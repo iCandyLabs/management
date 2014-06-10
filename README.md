@@ -10,6 +10,10 @@ Minimalist EC2 configuration & deployment tool.
 
 `gem install management`
 
+#### Intro
+
+Read [this short blog post](http://sdegutis.github.io/2014/06/09/announcing-management/) for a brief summary of this project.
+
 #### Usage
 
 ```
