@@ -40,8 +40,7 @@ module Management
       end
 
       puts
-      puts "--------"
-      puts "Success!"
+      puts "############ Success!"
 
     end
 
