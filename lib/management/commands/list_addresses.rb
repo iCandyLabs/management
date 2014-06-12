@@ -11,6 +11,7 @@ module Management
         {size: 20, title: "IP",         fn: ->(addr){ addr.public_ip } },
         {size: 20, title: "Server",     fn: ->(addr){ s = live_servers.find{|server| server.id == addr.server_id }; s ? s.name : "n/a" } },
         {size: 30, title: "Name",       fn: ->(addr){ a = config[:addresses].find{|k, v| v == addr.public_ip}; a ? a.first : "n/a" } },
+        {size: 15, title: "Status",     fn: ->(addr){ s = live_servers.find{|server| server.id == addr.server_id }; s ? s.state : "n/a" } },
       ]
 
       format = cols.map{|c| "%-#{c[:size]}s"}.join("  ") + "\n"
