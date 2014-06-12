@@ -51,54 +51,50 @@ to only work on EC2.
 
 Put this in `management_config.yml` at the root of some project:
 
-```yaml
-cloud:
-  provider: AWS
-  aws_access_key_id: 123
-  aws_secret_access_key: 456
-  region: New York 1
+    cloud:
+      provider: AWS
+      aws_access_key_id: 123
+      aws_secret_access_key: 456
+      region: New York 1
 
-envs:
-  - staging
-  - production
+    envs:
+      - staging
+      - production
 
-types:
-  web:
-    image_id: ami-1234
-    flavor_id: m1.small
-    key_name: my-ssh-key-name
-    groups: ["web"]
-    ssh_key_path: resources/my-ssh-key
+    types:
+      web:
+        image_id: ami-1234
+        flavor_id: m1.small
+        key_name: my-ssh-key-name
+        groups: ["web"]
+        ssh_key_path: resources/my-ssh-key
 
-scripts:
-  setup-web:
-    - copy: [resources/scripts/bootstrap_base.sh, /home/webapp/bootstrap_base.sh]
-    - run: /home/webapp/bootstrap_base.sh
-    - copy: [resources/files/web.conf.erb, /etc/init/web.conf, template: true]
-    - copy: [resources/files/nginx.conf, /etc/init/nginx.conf]
-    - copy: [resources/scripts/start_web_server.sh, /home/webapp/start_web_server.sh]
-    - run: /home/webapp/start_web_server.sh
-```
+    scripts:
+      setup-web:
+        - copy: [resources/scripts/bootstrap_base.sh, /home/webapp/bootstrap_base.sh]
+        - run: /home/webapp/bootstrap_base.sh
+        - copy: [resources/files/web.conf.erb, /etc/init/web.conf, template: true]
+        - copy: [resources/files/nginx.conf, /etc/init/nginx.conf]
+        - copy: [resources/scripts/start_web_server.sh, /home/webapp/start_web_server.sh]
+        - run: /home/webapp/start_web_server.sh
 
 Management doesn't care where any of your files are, with the exception of
 `management_config.yml`, which it expects to be in your project's
 root. Here's the relevant part of the file structure that the above
 sample config assumes:
 
-```
-./my-project
-|-- management_config.yml
-`-- resources
-    |-- files
-    |   |-- nginx.conf
-    |   `-- web.conf.erb
-    |-- keys
-    |   |-- id_rsa_digitalocean
-    |   `-- id_rsa_digitalocean.pub
-    `-- scripts
-        |-- bootstrap_base.sh
-        `-- start_web_server.sh
-```
+    ./my-project
+    |-- management_config.yml
+    `-- resources
+        |-- files
+        |   |-- nginx.conf
+        |   `-- web.conf.erb
+        |-- keys
+        |   |-- id_rsa_digitalocean
+        |   `-- id_rsa_digitalocean.pub
+        `-- scripts
+            |-- bootstrap_base.sh
+            `-- start_web_server.sh
 
 #### Details
 
@@ -153,17 +149,15 @@ If you wanted to install Ruby 2 in your setup phase, you might add
 this to one of your scripts
 ([courtesy of Brandon Hilkert](https://github.com/brandonhilkert/fucking_shell_scripts)):
 
-```bash
-sudo apt-get -y install build-essential zlib1g-dev libssl-dev libreadline6-dev libyaml-dev
-cd /tmp
-wget http://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p247.tar.gz
-tar -xzf ruby-2.0.0-p247.tar.gz
-cd ruby-2.0.0-p247
-./configure --prefix=/usr/local
-make
-sudo make install
-rm -rf /tmp/ruby*
-```
+    sudo apt-get -y install build-essential zlib1g-dev libssl-dev libreadline6-dev libyaml-dev
+    cd /tmp
+    wget http://ftp.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p247.tar.gz
+    tar -xzf ruby-2.0.0-p247.tar.gz
+    cd ruby-2.0.0-p247
+    ./configure --prefix=/usr/local
+    make
+    sudo make install
+    rm -rf /tmp/ruby*
 
 #### License
 
