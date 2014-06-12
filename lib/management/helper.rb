@@ -25,6 +25,12 @@ module Management
       server
     end
 
+    def get_address(name)
+      addresses = cloud.addresses
+      ip = config[:addresses][name.to_sym] or invalid_selection "Invalid address: #{name}", config[:addresses].map(&:first)
+      addresses.find{|a| a.public_ip == ip} or abort "Could not find an address with the IP #{ip} (#{name})"
+    end
+
     def live_servers
       cloud.servers.reject{ |s| s.state == 'terminated' }
     end
