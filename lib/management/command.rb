@@ -33,12 +33,18 @@ module Management
       end.join(' ')
     end
 
-    def call_with(args, error_handler)
-      num_all_args = fn.parameters.count
-      num_req_args = fn.arity
+    def true_arity
+      min = fn.parameters.take_while{|req, name| req == :req}.count
+      max = fn.parameters.count
+      max = Float::INFINITY if max > 0 && fn.parameters.last.first == :rest
+      min..max
+    end
 
-      error_handler.call "not enough arguments" if args.count < num_req_args
-      error_handler.call "too many arguments"   if args.count > num_all_args
+    def call_with(args, error_handler)
+      arity = self.true_arity
+
+      error_handler.call "not enough arguments" if args.count < arity.begin
+      error_handler.call "too many arguments"   if args.count > arity.end
 
       fn.call *args
     end

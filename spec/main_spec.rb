@@ -40,6 +40,41 @@ describe 'management' do
 
   before { subject.define_singleton_method(:raw_yaml) { YAML.load(SampleConfig) } }
 
+  describe Management::Command do
+
+    describe "true arity" do
+
+      around(:each) { |example| timeout(0.05, &example) }
+
+      it "considers 1 required arg to have 1..1 arity" do
+        subject.define_singleton_method(:run){|x|}
+        expect(subject.true_arity).to eq 1..1
+      end
+
+      it "considers 2 required args to have 2..2 arity" do
+        subject.define_singleton_method(:run){|x, y|}
+        expect(subject.true_arity).to eq 2..2
+      end
+
+      it "considers 2 required args and one optinal arg to have 2..3 arity" do
+        subject.define_singleton_method(:run){|x, y, z = nil|}
+        expect(subject.true_arity).to eq 2..3
+      end
+
+      it "considers 2 required args and a final rest arg to have 2..Float::INFINITY arity" do
+        subject.define_singleton_method(:run){|x, y, *z|}
+        expect(subject.true_arity).to eq 2..Float::INFINITY
+      end
+
+      it "considers 1 required arg, one optional arg, and a final rest arg to have 1..Float::INFINITY arity" do
+        subject.define_singleton_method(:run){|x, y = nil, *z|}
+        expect(subject.true_arity).to eq 1..Float::INFINITY
+      end
+
+    end
+
+  end
+
   describe Management::Helper do
 
     subject { Object.new.extend Management::Helper }
@@ -217,9 +252,9 @@ describe 'management' do
 
   end
 
-  describe Management::DestroyServer do
+  describe Management::DestroyServers do
 
-    let(:server) { double "server" }
+    let(:server) { double "server", name: "server-1" }
     before { allow(subject).to receive(:get_server).with("server-1").and_return(server) }
 
     it "destroys the given server if you type 'Yes' verbatim" do
@@ -230,13 +265,13 @@ describe 'management' do
     it "does not destroy the given server if you don't type 'Yes' verbatim" do
       expect(server).not_to receive(:destroy)
       without_stdout do
-        with_stdin("yes\n") { subject.run("server-1") }
-        with_stdin("Y\n") { subject.run("server-1") }
-        with_stdin("y\n") { subject.run("server-1") }
-        with_stdin("yep\n") { subject.run("server-1") }
-        with_stdin("\n") { subject.run("server-1") }
-        with_stdin("YES\n") { subject.run("server-1") }
-        with_stdin("Yes.\n") { subject.run("server-1") }
+        expect{with_stdin("yes\n" ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("Y\n"   ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("y\n"   ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("yep\n" ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("\n"    ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("YES\n" ) { subject.run("server-1") }}.to raise_error SystemExit
+        expect{with_stdin("Yes.\n") { subject.run("server-1") }}.to raise_error SystemExit
       end
     end
 
