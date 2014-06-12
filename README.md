@@ -6,7 +6,9 @@ Minimalist EC2 configuration & deployment tool.
 
 [![Build Status](https://travis-ci.org/sdegutis/management.svg?branch=master)](https://travis-ci.org/sdegutis/management)
 [![Dependency Status](https://gemnasium.com/sdegutis/management.svg)](https://gemnasium.com/sdegutis/management)
-
+[![Code Climate](https://codeclimate.com/github/sdegutis/management.png)](https://codeclimate.com/github/sdegutis/management)
+[![Gem Version](https://badge.fury.io/rb/management.svg)](http://badge.fury.io/rb/management)
+[![Gittip](http://img.shields.io/gittip/sdegutis.png)](https://www.gittip.com/sdegutis/)
 
 #### Install
 
