@@ -4,7 +4,8 @@ Minimalist EC2 configuration & deployment tool.
 
 - Version: **1.2**
 
-![build status](https://travis-ci.org/sdegutis/management.svg?branch=master)
+![build status](https://travis-ci.org/sdegutis/management.svg?branch=master) [![Dependency Status](https://gemnasium.com/sdegutis/management.svg)](https://gemnasium.com/sdegutis/management)
+
 
 #### Install
 
