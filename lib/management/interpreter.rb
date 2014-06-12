@@ -6,7 +6,7 @@ module Management
     commands = Management::Command.all
 
     parser = OptionParser.new do |opts|
-      opts.banner = "Usage: management [command] [args*]"
+      opts.banner = "Usage: management [command [args*]]"
       opts.separator('')
       opts.separator('Commands:')
       commands.each { |command| opts.separator command.help_string }
