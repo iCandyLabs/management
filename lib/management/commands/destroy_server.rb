@@ -13,8 +13,9 @@ module Management
       answer = $stdin.gets.chomp
 
       if answer == 'Yes'
+        puts "Destroying #{server_name}..."
         server.destroy
-        puts "Destroyed."
+        puts "Done."
       else
         puts "Aborted."
       end

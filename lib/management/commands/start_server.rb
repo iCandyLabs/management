@@ -8,8 +8,9 @@ module Management
 
     def run(server_name)
       server = get_server(server_name)
+      puts "Starting #{server_name}..."
       server.start
-      puts "Started #{server_name}."
+      puts "Done."
     end
 
   end

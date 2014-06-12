@@ -8,8 +8,9 @@ module Management
 
     def run(server_name)
       server = get_server(server_name)
+      puts "Stopping #{server_name}..."
       server.stop
-      puts "Stopped #{server_name}."
+      puts "Done."
     end
 
   end
