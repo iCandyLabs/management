@@ -26,10 +26,14 @@ module Management
         when :copy
           copy_file(server, *data)
         when :run
-          run_remote_command(server, data)
+          code = run_remote_command(server, data)
+          abort "Failed. Exit code: #{code}" if code != 0
         end
-
       end
+
+      puts
+      puts "--------"
+      puts "Success!"
 
     end
 
@@ -70,20 +74,11 @@ module Management
 
     end
 
+    # returns error code
     def run_remote_command(server, cmd)
       puts "Running #{cmd}"
-
       result = server.ssh("#{cmd}").first
-
-      if result.respond_to?(:status)
-        puts
-        puts "---------------------------"
-        if result.status == 0
-          puts "Success!"
-        else
-          puts "Failed. Exit code: #{result.status}"
-        end
-      end
+      return result.status
     end
 
     def missing_local_files(script)
