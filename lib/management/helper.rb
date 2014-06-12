@@ -32,7 +32,7 @@ module Management
     end
 
     def live_servers
-      cloud.servers.reject{ |s| s.state == 'terminated' }
+      cloud.servers.reject{ |s| s.state == 'terminated' || s.state == 'shutting-down' }
     end
 
     def config
