@@ -18,14 +18,18 @@ module Management
       self.class.name.split('::').last.
         gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
         gsub(/([a-z\d])([A-Z])/,'\1_\2').
-        tr("_", "-").
+        tr('_', '-').
         downcase
     end
 
     def help_string
       return sprintf("%20s ", self.command_name) + fn.parameters.map do |req, name|
-        name = "<#{name.to_s.sub('_name', '')}>"
-        req == :opt ? "[#{name}]" : name
+        name = '<' + name.to_s.sub(/_names?/, '') + '>'
+        case req
+        when :opt then '[' + name + ']'
+        when :rest then name + ' [...]'
+        else name
+        end
       end.join(' ')
     end
 
