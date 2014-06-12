@@ -45,6 +45,7 @@ module Management
     def copy_file(server, local_path, remote_path, opts = nil)
       should_template = opts && opts[:template]
       custom_chown = opts && opts[:chown]
+      custom_chmod = opts && opts[:chmod]
 
       Dir.mktmpdir('management-file-dir') do |file_tmpdir|
 
@@ -70,6 +71,7 @@ module Management
           server.copy_file(local_tar_path, remote_tar_path)
           server.extract_tar(remote_tar_path)
           server.chown_r(remote_path, custom_chown) if custom_chown
+          server.chmod(remote_path, custom_chmod) if custom_chmod
         end
       end
     end

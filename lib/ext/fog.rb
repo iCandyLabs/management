@@ -71,4 +71,8 @@ class Fog::Compute::Server
   def chown_r(remote_path, chown)
     ssh("sudo chown -R #{chown} #{remote_path}")
   end
+
+  def chmod(remote_path, chmod)
+    ssh("sudo chmod #{chmod} #{remote_path}")
+  end
 end

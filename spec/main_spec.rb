@@ -184,6 +184,10 @@ describe 'management' do
           FileUtils.chown_R(user, group, File.join("/fake-remote-dir", remote))
         end
 
+        server.define_singleton_method(:chmod) do |remote, chmod|
+          FileUtils.chmod(Integer(chmod), File.join("/fake-remote-dir", remote))
+        end
+
       end
 
       it "copies file contents into their remote paths" do
@@ -217,6 +221,24 @@ describe 'management' do
         stats = File.stat("/fake-remote-dir/remote/foo")
         expect( Etc.getpwuid(stats.uid).name ).to eq `id -un`.chomp
         expect( Etc.getgrgid(stats.gid).name ).to eq `id -gn`.chomp
+      end
+
+      it "chmods files correctly when specified" do
+        File.write("foo", "hello world")
+        FileUtils.chmod(0755, "foo")
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo", chmod: "0700") }
+
+        stats = File.stat("/fake-remote-dir/remote/foo")
+        expect(stats.mode & 0o777).to eq 0o700
+      end
+
+      it "doesn't chmod anything unless specified" do
+        File.write("foo", "hello world")
+        FileUtils.chmod(0755, "foo")
+        without_stdout { subject.copy_file(server, "foo", "/remote/foo") }
+
+        stats = File.stat("/fake-remote-dir/remote/foo")
+        expect(stats.mode & 0o777).to eq 0o755
       end
 
       it "fails if multiple local paths don't exist" do
