@@ -24,10 +24,18 @@ module Management
 
         case type.to_sym
         when :copy
-          copy_file(server, *data)
+          local_path, remote_path, opts = *data
+          puts "############ Copying #{local_path} -> #{remote_path}"
+
+          copy_file(server, local_path, remote_path, opts)
         when :run
-          code = run_remote_command(server, data)
-          abort "Failed. Exit code: #{code}" if code != 0
+          cmd = data
+          puts "############ Running #{cmd}"
+
+          code = run_remote_command(server, cmd)
+          if code != 0
+            abort "Failed. Exit code: #{code}"
+          end
         end
       end
 
@@ -40,8 +48,6 @@ module Management
     def copy_file(server, local_path, remote_path, opts = nil)
       should_template = opts && opts[:template]
       custom_chown = opts && opts[:chown]
-
-      puts "Copying #{local_path} -> #{remote_path}"
 
       Dir.mktmpdir('management-file-dir') do |file_tmpdir|
 
@@ -67,16 +73,12 @@ module Management
           server.copy_file(local_tar_path, remote_tar_path)
           server.extract_tar(remote_tar_path)
           server.chown_r(remote_path, custom_chown) if custom_chown
-
         end
-
       end
-
     end
 
     # returns error code
     def run_remote_command(server, cmd)
-      puts "Running #{cmd}"
       result = server.ssh("#{cmd}").first
       return result.status
     end
