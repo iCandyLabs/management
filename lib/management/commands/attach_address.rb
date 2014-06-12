@@ -2,7 +2,7 @@ require_relative '../command'
 
 module Management
 
-  class AssociateAddress < Management::Command
+  class AttachAddress < Management::Command
 
     include Management::Helper
 
