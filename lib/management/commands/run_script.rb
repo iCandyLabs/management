@@ -39,9 +39,7 @@ module Management
         end
       end
 
-      puts
       puts "############ Success!"
-
     end
 
     def copy_file(server, local_path, remote_path, opts = nil)
