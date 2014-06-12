@@ -8,70 +8,51 @@ Minimalist EC2 configuration & deployment tool.
 
 #### Install
 
-`gem install management`
-
-#### Intro
-
-Read [this short blog post](http://sdegutis.github.io/2014/06/09/announcing-management/) for a brief summary of this project.
+    gem install management
 
 #### Usage
 
-```
-$ management
-Usage: management [command] [args*]
+    $ management
+    Usage: management [command [arg ...]]
 
-Commands:
-       create-server <env> <type>
-        list-servers [<env>]
-      destroy-server <server>
-        start-server <server>
-         stop-server <server>
-          run-script <server> <script>
-          ssh-server <server>
+    Commands:
+           create-server <env> <type>
+            list-servers [<env>]
+         destroy-servers <server> [...]
+            start-server <server>
+             stop-server <server>
+              run-script <server> <script>
+              ssh-server <server>
+          list-addresses
+          attach-address <address> <server>
+            open-console
 
-    -h, --help                       Display this screen
-    -v, --version                    Show version
+        -h, --help                       Display this screen
+        -v, --version                    Show version
 
-$ management list-servers
-Name                  State       IP                    Private IP            Size        Env              Type             EC2 ID
---------------------  ----------  --------------------  --------------------  ----------  ---------------  ---------------  -----------
+#### Features
 
+1. All your configuration is done in a single YAML file.
+2. Automating deployment can be done in plain-old bash.
+3. You explicitly specify what files to copy and where to.
+4. You can mix run-script and copy-file phases together.
+5. There's a built-in concept of environments.
+6. You can template any of your copied files (using ERB).
+7. There are as few implicit rules as possible.
 
-$ management create-server staging web
-Created "staging-web-1".
+Management isn't for everyone. It uses a push-based method which isn't
+ideal if you have tons of servers, but is perfect for small setups
+like the one we have at work. Also, it assumes you're only dealing
+with servers that it created, since it requires certain metadata to
+work. And because it uses EC2 tags, it's currently kind of hard-coded
+to only work on EC2.
 
+#### Sample Configs
 
-$ management list-servers
-Name                  State       IP                    Private IP            Size        Env              Type             EC2 ID
---------------------  ----------  --------------------  --------------------  ----------  ---------------  ---------------  -----------
-staging-web-1         running     101.102.103.104       1.2.3.4               m1.large    staging          db               i-12341234
-
-
-$ management run-script staging-web-1 setup-web
-Copying resources/scripts/bootstrap_base.sh -> /home/webapp/bootstrap_base.sh
-Running /home/webapp/bootstrap_base.sh
-[...snip...]
-Copying resources/files/web.conf.erb -> /etc/init/web.conf
-Copying resources/files/nginx.conf -> /etc/init/nginx.conf
-Copying resources/scripts/start_web_server.sh -> /home/webapp/start_web_server.sh
-Running /home/webapp/start_web_server.sh
-[...snip...]
-```
-
-#### Niche
-
-The remote server only needs ssh and `tar -xzf` to be available, which
-means it'll work in pretty much any linux server, out-of-the-box.
-
-If you only need to provision and manage a handful of servers, this
-project may be right for you.
-
-#### Setup
-
-Put this in `management_config.yml':
+Put this in `management_config.yml` at the root of some project:
 
 ```yaml
-cloud:  # NOTE: this just gets passed to Fog::Compute.new
+cloud:
   provider: AWS
   aws_access_key_id: 123
   aws_secret_access_key: 456
@@ -82,7 +63,7 @@ envs:
   - production
 
 types:
-  web:  # NOTE: this just gets passed to compute.servers.create
+  web:
     image_id: ami-1234
     flavor_id: m1.small
     key_name: my-ssh-key-name
