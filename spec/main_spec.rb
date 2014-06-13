@@ -104,7 +104,7 @@ describe 'management' do
 
   end
 
-  describe Management::RunScript do
+  describe Management::Server::Run do
 
     include FakeFS::SpecHelpers
 
@@ -262,7 +262,7 @@ describe 'management' do
 
   end
 
-  describe Management::CreateServer do
+  describe Management::Server::Create do
 
     it "uses unique names for servers" do
       fake_server = Struct.new(:name)
@@ -277,7 +277,7 @@ describe 'management' do
 
   end
 
-  describe Management::DestroyServers do
+  describe Management::Server::Destroy do
 
     let(:server) { double "server", name: "server-1" }
     before { allow(subject).to receive(:get_server).with("server-1").and_return(server) }
@@ -302,7 +302,7 @@ describe 'management' do
 
   end
 
-  describe Management::StopServer do
+  describe Management::Server::Stop do
 
     let(:server) { double "server" }
     before { allow(subject).to receive(:get_server).with("server-1").and_return(server) }
