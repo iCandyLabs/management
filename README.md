@@ -100,8 +100,8 @@ And these contents of `management_config.yml`:
 
 You could run:
 
-    $ management create-server staging web
-    $ management run-script staging-web-1 setup-web
+    $ management server:create staging web
+    $ management server:run staging-web-1 setup-web
 
 And you'd have a fully functional web server!
 
