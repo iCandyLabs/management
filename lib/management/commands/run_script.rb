@@ -35,7 +35,7 @@ module Management
 
           code = run_remote_command(server, cmd)
           if code != 0
-            abort "Failed. Exit code: #{code}"
+            abort "############ Failed. Exit code: #{code}"
           end
         end
       end

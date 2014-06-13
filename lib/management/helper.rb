@@ -43,7 +43,7 @@ module Management
     end
 
     def system_verbose(cmd)
-      puts "Running: #{cmd}"
+      puts "############ Running: #{cmd}"
       system cmd
     end
 
