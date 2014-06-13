@@ -18,16 +18,16 @@ Minimalist EC2 configuration & deployment tool.
     Usage: management [command [arg ...]]
 
     Commands:
-           create-server <env> <type>
-            list-servers [<env>]
-         destroy-servers <server> [...]
-            start-server <server>
-             stop-server <server>
-              run-script <server> <script>
-              ssh-server <server>
-          list-addresses
-          attach-address <address> <server>
-            open-console
+      server:create    <env> <type>
+      server:list      [<env>]
+      server:destroy   <server> [...]
+      server:start     <server>
+      server:stop      <server>
+      server:run       <server> <script>
+      server:ssh       <server>
+      server:console
+      address:list
+      address:attach   <address> <server>
 
         -h, --help                       Display this screen
         -v, --version                    Show version

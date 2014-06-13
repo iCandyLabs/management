@@ -10,20 +10,24 @@ module Management
       all << subclass.new
     end
 
+    def self.maxlen
+      all.map(&:command_name).map(&:size).max
+    end
+
     def fn
       method(:run)
     end
 
     def command_name
-      self.class.name.split('::').last.
-        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-        gsub(/([a-z\d])([A-Z])/,'\1_\2').
-        tr('_', '-').
+      self.class.name.
+        split('::').
+        drop(1).
+        join(":").
         downcase
     end
 
-    def help_string
-      return sprintf("%20s ", self.command_name) + fn.parameters.map do |req, name|
+    def arg_list
+      fn.parameters.map do |req, name|
         name = '<' + name.to_s.sub(/_names?/, '') + '>'
         case req
         when :opt then '[' + name + ']'
@@ -31,6 +35,10 @@ module Management
         else name
         end
       end.join(' ')
+    end
+
+    def help_string
+      sprintf "  %-#{Command.maxlen + 2}s %s", command_name, arg_list
     end
 
     def true_arity
