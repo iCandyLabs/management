@@ -69,7 +69,7 @@ Put this in `management_config.yml` at the root of some project:
         flavor_id: m1.small
         key_name: my-ssh-key-name
         groups: ["web"]
-        ssh_key_path: resources/my-ssh-key
+        ssh_key_path: resources/keys/id_rsa_aws
 
     scripts:
       setup-web:
@@ -85,18 +85,21 @@ Management doesn't care where any of your files are, with the exception of
 root. Here's the relevant part of the file structure that the above
 sample config assumes:
 
-    ./my-project
-    |-- management_config.yml
-    `-- resources
-        |-- files
-        |   |-- nginx.conf
-        |   `-- web.conf.erb
-        |-- keys
-        |   |-- id_rsa_digitalocean
-        |   `-- id_rsa_digitalocean.pub
-        `-- scripts
-            |-- bootstrap_base.sh
-            `-- start_web_server.sh
+    $ tree my-project/
+    my-project/
+    ├── management_config.yml
+    └── resources
+        ├── files
+        │   ├── nginx.conf
+        │   └── web.conf.erb
+        ├── keys
+        │   ├── id_rsa_aws
+        │   └── id_rsa_aws.pub
+        └── scripts
+            ├── bootstrap_base.sh
+            └── start_web_server.sh
+
+    4 directories, 7 files
 
 #### Details
 
