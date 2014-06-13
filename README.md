@@ -49,9 +49,26 @@ with servers that it created, since it requires certain metadata to
 work. And because it uses EC2 tags, it's currently kind of hard-coded
 to only work on EC2.
 
-#### Sample Configs
+#### Example
 
-Put this in `management_config.yml` at the root of some project:
+Given this fictional project tree:
+
+    $ tree my-project/
+    my-project/
+    ├── management_config.yml
+    ├── < other project files... >
+    └── resources
+        ├── files
+        │   ├── nginx.conf
+        │   └── web.conf.erb
+        ├── keys
+        │   ├── id_rsa_aws
+        │   └── id_rsa_aws.pub
+        └── scripts
+            ├── bootstrap_base.sh
+            └── start_web_server.sh
+
+And these contents of `management_config.yml`:
 
     cloud:
       provider: AWS
@@ -80,26 +97,12 @@ Put this in `management_config.yml` at the root of some project:
         - copy: [resources/scripts/start_web_server.sh, /home/webapp/start_web_server.sh]
         - run: /home/webapp/start_web_server.sh
 
-Management doesn't care where any of your files are, with the exception of
-`management_config.yml`, which it expects to be in your project's
-root. Here's the relevant part of the file structure that the above
-sample config assumes:
+You could run:
 
-    $ tree my-project/
-    my-project/
-    ├── management_config.yml
-    └── resources
-        ├── files
-        │   ├── nginx.conf
-        │   └── web.conf.erb
-        ├── keys
-        │   ├── id_rsa_aws
-        │   └── id_rsa_aws.pub
-        └── scripts
-            ├── bootstrap_base.sh
-            └── start_web_server.sh
+    $ management create-server staging web
+    $ management run-script staging-web-1 setup-web
 
-    4 directories, 7 files
+And you'd have a fully functional web server!
 
 #### Details
 
