@@ -1,6 +1,3 @@
-require 'fog'
-require 'yaml'
-
 module Management
 
   module Helper
@@ -40,6 +37,8 @@ module Management
     end
 
     def cloud
+      require 'fog'
+      require_relative '../ext/fog'
       @cloud ||= Fog::Compute.new(config[:cloud])
     end
 
@@ -52,6 +51,7 @@ module Management
     private
 
     def raw_yaml
+      require 'yaml'
       YAML.load(File.read("management_config.yml"))
     end
 

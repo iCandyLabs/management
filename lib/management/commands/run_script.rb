@@ -1,8 +1,4 @@
 require_relative '../command'
-require 'tmpdir'
-require 'fileutils'
-require 'erb'
-require 'shellwords'
 
 module Management
 
@@ -11,6 +7,11 @@ module Management
     include Management::Helper
 
     def run(server_name, script_name)
+      require 'tmpdir'
+      require 'fileutils'
+      require 'erb'
+      require 'shellwords'
+
       server = get_server(server_name)
       script = get_script(script_name)
 

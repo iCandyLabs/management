@@ -1,4 +1,3 @@
-require_relative 'ext/fog'
 require_relative 'management/version'
 require_relative 'management/interpreter'
 require_relative 'management/helper'

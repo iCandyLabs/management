@@ -3,7 +3,8 @@ require 'fakefs/spec_helpers'
 require 'stringio'
 require 'pry'
 require 'etc'
-
+require 'yaml'
+require 'timeout'
 
 SampleConfig = <<EOC
 cloud:

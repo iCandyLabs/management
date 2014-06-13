@@ -1,8 +1,8 @@
-require 'optparse'
-
 module Management
 
   def self.interpret!(argv)
+    require 'optparse'
+
     commands = Management::Command.all
 
     parser = OptionParser.new do |opts|
@@ -11,8 +11,8 @@ module Management
       opts.separator('Commands:')
       commands.each { |command| opts.separator command.help_string }
       opts.separator('')
-      opts.on('-h', '--help', 'Display this screen') { puts opts; exit }
-      opts.on('-v', '--version', 'Show version') { puts Management::VERSION; exit }
+      opts.on('-h', '--help', 'Display this screen') { abort opts.to_s }
+      opts.on('-v', '--version', 'Show version') { abort Management::VERSION }
     end
 
     abort parser.help if argv.empty?
