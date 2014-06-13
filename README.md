@@ -76,6 +76,9 @@ And these contents of `management_config.yml`:
       aws_secret_access_key: 456
       region: New York 1
 
+    root_user: ubuntu
+    ssh_key_path: resources/keys/id_rsa_aws
+
     envs:
       - staging
       - production
@@ -86,7 +89,6 @@ And these contents of `management_config.yml`:
         flavor_id: m1.small
         key_name: my-ssh-key-name
         groups: ["web"]
-        ssh_key_path: resources/keys/id_rsa_aws
 
     scripts:
       setup-web:

@@ -17,13 +17,15 @@ envs:
   - staging
   - production
 
+root_user: ubuntu
+ssh_key_path: resources/my-ssh-key
+
 types:
   web:
     image_id: ami-1234
     flavor_id: m1.small
     key_name: my-ssh-key-name
     groups: ["web"]
-    ssh_key_path: resources/my-ssh-key
 
 scripts:
   testing:

@@ -15,7 +15,7 @@ module Management
       server = get_server(server_name)
       script = get_script(script_name)
 
-      server.private_key_path = config[:types][server.type.to_sym][:ssh_key_path]
+      server.private_key_path = config[:ssh_key_path]
 
       missing = missing_local_files(script)
       abort "The following files are missing:" + (["\n"] + missing).join("\n - ") if !missing.empty?
