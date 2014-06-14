@@ -55,7 +55,7 @@ Given this fictional project tree:
     $ tree my-project/
     my-project/
     ├── management_config.yml
-    ├── < other project files... >
+    ├── (other project files...)
     └── resources
         ├── files
         │   ├── nginx.conf
